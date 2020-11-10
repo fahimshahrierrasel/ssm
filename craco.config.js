@@ -1,9 +1,7 @@
-// const sassResourcesLoader = require("craco-sass-resources-loader");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 module.exports = {
-//   plugins: [
-//     {
-//       plugin: sassResourcesLoader,
-//     },
-//   ],
+  webpack: {
+    plugins: [new MonacoWebpackPlugin()],
+  },
 };

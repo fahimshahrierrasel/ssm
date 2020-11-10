@@ -1,0 +1,16 @@
+.snippet-list {
+  height: 100vh;
+  border-right: 1px solid gray;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+
+  .list-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 2px 5px;
+  }
+
+  .snippets {
+    overflow-y: scroll;
+  }
+}
