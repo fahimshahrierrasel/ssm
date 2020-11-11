@@ -1,18 +1,32 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = { location: "" };
+const initialState = { location: "", loading: false };
 
 const navigationSlice = createSlice({
   name: "navigations",
   initialState: initialState,
   reducers: {
-    newSnippet: (state, action: PayloadAction) => (state = { location: "new" }),
-    editSnippet: (state, action: PayloadAction) =>
-      (state = { location: "edit" }),
-    discardSnippet: (state, action: PayloadAction) => (state = initialState),
-    about: (state, action: PayloadAction) => (state = { location: "about" }),
-    settings: (state, action: PayloadAction) =>
-      (state = { location: "settings" }),
+    newSnippet: (state, action: PayloadAction) => {
+      state.location = "new";
+    },
+    editSnippet: (state, action: PayloadAction) => {
+      state.location = "edit";
+    },
+    discardSnippet: (state, action: PayloadAction) => {
+      state.location = "";
+    },
+    about: (state, action: PayloadAction) => {
+      state.location = "about";
+    },
+    settings: (state, action: PayloadAction) => {
+      state.location = "settings";
+    },
+    showLoader: (state, action: PayloadAction) => {
+      state.loading = true;
+    },
+    hideLoader: (state, action: PayloadAction) => {
+      state.loading = false;
+    },
   },
 });
 
@@ -22,8 +36,8 @@ export const {
   discardSnippet,
   about,
   settings,
+  showLoader,
+  hideLoader,
 } = navigationSlice.actions;
-
-export type NavigationState = ReturnType<typeof navigationSlice.reducer>;
 
 export default navigationSlice.reducer;

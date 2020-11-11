@@ -1,0 +1,21 @@
+.outline-item {
+  padding: 5px 15px;
+
+  &:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+  }
+}
+
+.outline-item__wrap {
+  margin: 2px;
+  padding: 2px 5px;
+  border: 1px solid black;
+
+  &:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+  }
+}

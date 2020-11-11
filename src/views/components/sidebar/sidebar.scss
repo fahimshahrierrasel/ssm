@@ -17,7 +17,7 @@
     }
 
     .sidebar-item {
-      padding-left: 15px;
+      
       padding-top: 5px;
       list-style-type: none;
       overflow-y: auto;
@@ -30,7 +30,7 @@
     }
 
     .sidebar-item__wrap {
-      padding: 5px 5px 5px 15px;
+      padding: 5px;
       display: flex;
       flex-wrap: wrap;
       align-content: flex-start;
