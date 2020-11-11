@@ -1,30 +1,28 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { IDropdownItem } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import { languageItems, languages } from "../../../data/constants";
-import { discardSnippet } from "../../../data/state/reducers";
+import { discardSnippet, RootState } from "../../../data/state/reducers";
 import "./snippet-form.scss";
 
 import MonacoEditor from "react-monaco-editor";
 import OutlineButton from "../outline-button";
 import { useDispatch } from "react-redux";
-
-const dropdownItems = [
-  { key: 1, value: "Folder 1" },
-  { key: 2, value: "Folder 2" },
-  { key: 3, value: "Folder 3" },
-  { key: 4, value: "Folder 4" },
-  { key: 5, value: "Folder 5" },
-];
+import { arrayToItems } from "../../../data/helpers";
 
 const SnippetForm = () => {
   const dispatch = useDispatch();
   const [folder, setFolder] = useState<IDropdownItem | null>(null);
   const [language, setLanguage] = useState<IDropdownItem | null>(null);
-  const [tags, setTags] = useState<IDropdownItem[]>([]);
+  const [tag, setTag] = useState<IDropdownItem[]>([]);
   const [snippet, setSnippet] = useState("");
+
+  const { folders, tags, languages } = useSelector(
+    (state: RootState) => state.snippets
+  );
+
   return (
     <div className="snippet-form">
       <div className="meta-info">
@@ -42,21 +40,23 @@ const SnippetForm = () => {
             }}
           />
         </div>
+
         <div className="folder">
           <label>Folder</label>
           <OutlineDropdown
-            items={dropdownItems}
+            items={arrayToItems(folders)}
             selected={folder}
             onChange={(newVal: IDropdownItem) => {
               setFolder(newVal);
             }}
           />
         </div>
+
         <div className="language">
           <label>Language</label>
           <OutlineDropdown
-            items={languageItems}
-            selected={language ?? languageItems[0]}
+            items={arrayToItems(languages)}
+            selected={language ?? arrayToItems(languages)[0]}
             onChange={(newVal: IDropdownItem) => {
               setLanguage(newVal);
             }}
@@ -66,10 +66,10 @@ const SnippetForm = () => {
         <div className="tags">
           <label>Tags</label>
           <OutlineMultiselect
-            items={dropdownItems}
-            selectedItems={tags}
+            items={arrayToItems(tags)}
+            selectedItems={tag}
             onItemChange={(updateItems: IDropdownItem[]) => {
-              setTags(updateItems);
+              setTag(updateItems);
             }}
           />
         </div>

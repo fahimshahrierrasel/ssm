@@ -1,9 +1,8 @@
 .sidebar {
   height: 100vh;
-  padding: 5px 0;
   border-right: 1px solid gray;
   display: grid;
-  grid-template-rows: auto repeat(3, 1fr);
+  grid-template-rows: auto repeat(3, 1fr) auto;
 
   .sidebar-block {
     overflow: hidden;
@@ -63,5 +62,13 @@
 
   .language {
     grid-row: 4;
+  }
+
+  .footer{
+    grid-row: 5;
+    display: grid;
+    padding: 5px;
+    column-gap: 5px;
+    grid-template-columns: repeat(2, 1fr);
   }
 }

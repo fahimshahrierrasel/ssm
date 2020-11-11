@@ -1,6 +1,8 @@
-export interface ITag {
+import { IMeta } from "./imeta";
+
+export interface ITag extends IMeta {
   id: string;
   name: string;
-  create_at: Date;
+  created_at: Date;
   updated_at: Date;
 }

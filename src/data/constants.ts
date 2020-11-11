@@ -1,5 +1,3 @@
-import { IDropdownItem } from "./models";
-
 export const languages = [
   "plaintext",
   "azcli",
@@ -40,9 +38,3 @@ export const languages = [
   "xml",
   "yaml",
 ];
-
-export const languageItems: IDropdownItem[] = languages.map(
-  (language, index) => {
-    return { key: index, value: language } as IDropdownItem;
-  }
-);

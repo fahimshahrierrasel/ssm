@@ -1,6 +1,8 @@
-export interface IFolder {
+import { IMeta } from "./imeta";
+
+export interface IFolder extends IMeta {
   id: string;
   name: string;
-  create_at: Date;
-  update_at: Date;
+  created_at: Date;
+  updated_at: Date;
 }

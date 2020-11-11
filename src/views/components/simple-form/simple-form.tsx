@@ -14,15 +14,13 @@ const SimpleForm = ({ placeholder, onSave, onCancel }: ISimpleForm) => {
   const [field, setField] = useState<string>("");
   return (
     <div className="simple-form">
-		<div className="form-fields">
-
-      <OutlineInput
-	  
-	  placeholder={placeholder}
-	  value={field}
-	  onChange={(newValue: string) => setField(newValue)}
-      />
-	  </div>
+      <div className="form-fields">
+        <OutlineInput
+          placeholder={placeholder}
+          value={field}
+          onChange={(newValue: string) => setField(newValue)}
+        />
+      </div>
       <div className="form-actions">
         <OutlineButton title="CANCEL" onClick={() => onCancel()} />
         <OutlineButton title="SAVE" onClick={() => onSave(field)} />

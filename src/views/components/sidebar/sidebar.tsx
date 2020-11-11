@@ -1,36 +1,27 @@
 import React, { useState } from "react";
-import { languages } from "../../../data/constants";
+import { useSelector, useDispatch } from "react-redux";
 import OutlineButton from "../outline-button";
+import { v4 as uuidv4 } from "uuid";
 import "./sidebar.scss";
 import { capitalize } from "lodash";
 import Modal from "../modal";
 import Portal from "../../portal";
 import SimpleForm from "../simple-form";
 import OutlineItem from "../outline-item";
-
-const folders = [
-  "JavaScript",
-  "TypeScript",
-  "React",
-  ".Net",
-  "Android",
-  "Java",
-  "Flutter",
-  "Dart",
-  "Xamarin",
-  "Git",
-  "Docker",
-  "Angular",
-  "Go",
-  "Sass",
-  "Tools",
-];
+import { RootState } from "../../../data/state/reducers";
+import { addFolder, addTag } from "../../../data/state/reducers/snippet";
 
 const Sidebar = () => {
   const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(
     false
   );
   const [showCreateTagModal, setShowCreateTagModal] = useState<boolean>(false);
+
+  const { folders, tags, languages } = useSelector(
+    (state: RootState) => state.snippets
+  );
+
+  const dispatch = useDispatch();
 
   return (
     <div className="sidebar">
@@ -54,7 +45,11 @@ const Sidebar = () => {
         </div>
         <div className="sidebar-item">
           {folders.map((folder) => (
-            <OutlineItem key={folder} title={folder} onItemClick={() => {}} />
+            <OutlineItem
+              key={folder.id}
+              title={folder.name}
+              onItemClick={() => {}}
+            />
           ))}
         </div>
       </div>
@@ -67,6 +62,16 @@ const Sidebar = () => {
               setShowCreateTagModal(true);
             }}
           />
+        </div>
+        <div className="sidebar-item__wrap">
+          {tags.map((tag) => (
+            <OutlineItem
+              key={tag.id}
+              title={capitalize(tag.name)}
+              onItemClick={() => {}}
+              wrapped
+            />
+          ))}
         </div>
       </div>
       <div className="sidebar-block language">
@@ -83,13 +88,25 @@ const Sidebar = () => {
         </div>
       </div>
 
+      <div className="footer">
+        <OutlineButton title="PROFILE" onClick={() => {}} />
+        <OutlineButton title="SETTINGS" onClick={() => {}} />
+      </div>
+
       {showCreateFolderModal && (
         <Portal>
           <Modal title="Create Folder">
             <SimpleForm
               placeholder="Folder Name"
               onSave={(fieldValue: string) => {
-                console.log(fieldValue);
+                dispatch(
+                  addFolder({
+                    id: uuidv4(),
+                    name: fieldValue,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                  })
+                );
                 setShowCreateFolderModal(false);
               }}
               onCancel={() => setShowCreateFolderModal(false)}
@@ -104,7 +121,14 @@ const Sidebar = () => {
             <SimpleForm
               placeholder="Tag Name"
               onSave={(fieldValue: string) => {
-                console.log(fieldValue);
+                dispatch(
+                  addTag({
+                    id: uuidv4(),
+                    name: fieldValue,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                  })
+                );
                 setShowCreateTagModal(false);
               }}
               onCancel={() => setShowCreateTagModal(false)}
