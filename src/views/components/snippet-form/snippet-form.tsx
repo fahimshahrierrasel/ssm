@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { IDropdownItem } from "../../../data/models";
+import { IDropdownItem, ISimpleSnippet } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import { discardSnippet, RootState } from "../../../data/state/reducers";
+import {
+  discardSnippet,
+  RootState,
+  createSnippet,
+} from "../../../data/state/reducers";
 import "./snippet-form.scss";
-
 import MonacoEditor from "react-monaco-editor";
 import OutlineButton from "../outline-button";
 import { useDispatch } from "react-redux";
@@ -15,13 +18,37 @@ import { arrayToItems } from "../../../data/helpers";
 const SnippetForm = () => {
   const dispatch = useDispatch();
   const [folder, setFolder] = useState<IDropdownItem | null>(null);
+  const [snippetName, setSnippetName] = useState<string>("");
   const [language, setLanguage] = useState<IDropdownItem | null>(null);
-  const [tag, setTag] = useState<IDropdownItem[]>([]);
-  const [snippet, setSnippet] = useState("");
+  const [selectedTags, setSelectedTags] = useState<IDropdownItem[]>([]);
+  const [snippetText, setSnippetText] = useState("");
 
   const { folders, tags, languages } = useSelector(
     (state: RootState) => state.snippets
   );
+
+  const onSaveClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // TODO: Need proper validation
+    if (snippetName.length < 3) {
+      alert("Name must be longer than 3+");
+    }
+
+    if (snippetText.length < 3) {
+      alert("Snippet must be longer than 3+");
+    }
+
+    dispatch(
+      createSnippet({
+        name: snippetName,
+        snippet: snippetText,
+        folder: folder?.value,
+        tags: selectedTags?.map((st) => st.value),
+        language: language?.value,
+      } as ISimpleSnippet)
+    );
+
+    dispatch(discardSnippet());
+  };
 
   return (
     <div className="snippet-form">
@@ -29,10 +56,10 @@ const SnippetForm = () => {
         <div className="name">
           <OutlineInput
             placeholder="Snippet Name"
-            value=""
-            onChange={() => {}}
+            value={snippetName}
+            onChange={(newVal: string) => setSnippetName(newVal)}
           />
-          <OutlineButton title="SAVE" onClick={() => {}} />
+          <OutlineButton title="SAVE" onClick={onSaveClick} />
           <OutlineButton
             title="CANCEL"
             onClick={() => {
@@ -67,9 +94,9 @@ const SnippetForm = () => {
           <label>Tags</label>
           <OutlineMultiselect
             items={arrayToItems(tags)}
-            selectedItems={tag}
+            selectedItems={selectedTags}
             onItemChange={(updateItems: IDropdownItem[]) => {
-              setTag(updateItems);
+              setSelectedTags(updateItems);
             }}
           />
         </div>
@@ -78,7 +105,7 @@ const SnippetForm = () => {
       <div className="snippet-editor">
         <MonacoEditor
           language={language?.value ?? languages[0]}
-          value={snippet}
+          value={snippetText}
           height="96%"
           options={{
             formatOnType: true,
@@ -87,7 +114,7 @@ const SnippetForm = () => {
             automaticLayout: true,
             cursorStyle: "line",
           }}
-          onChange={(newValue) => setSnippet(newValue)}
+          onChange={(newValue) => setSnippetText(newValue)}
         />
       </div>
     </div>

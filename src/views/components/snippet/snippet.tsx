@@ -1,24 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./snippet.scss";
+import { ISnippet } from "../../../data/models";
 
 interface ISnippetProps {
-  title: string;
-  language: string;
+  snippet: ISnippet
+  onClick: Function
 }
 
-const Snippet = ({ title, language }: ISnippetProps) => {
+const Snippet = ({ snippet, onClick }: ISnippetProps) => {
   return (
-    <div className="snippet">
-      <span className="snippet-title">{title}</span>
-      <span className="snippet-lang">{language}</span>
+    <div className="snippet" onClick={(e) => onClick()}>
+      <span className="snippet-title">{snippet.name}</span>
+      <span className="snippet-lang">{snippet.language}</span>
     </div>
   );
 };
 
 Snippet.propTypes = {
-  title: PropTypes.string.isRequired,
-  language: PropTypes.string.isRequired,
+  snippet: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default Snippet;

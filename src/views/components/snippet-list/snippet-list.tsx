@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import OutlineButton from "../outline-button";
 import OutlineInput from "../outline-input";
 import Snippet from "../snippet/snippet";
 import "./snippet-list.scss";
-import { newSnippet } from "../../../data/state/reducers";
-
-const languages = ["JavaScript", "TypeScript", "Java", "Dart", "Go"];
+import {
+  newSnippet,
+  setSelectedSnippet,
+  RootState,
+} from "../../../data/state/reducers";
 
 const SnippetList = () => {
   const dispatch = useDispatch();
+  const { snippets } = useSelector((state: RootState) => state.snippets);
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -24,16 +27,21 @@ const SnippetList = () => {
       />
       <div className="list-header">
         <h4 style={{ padding: "5px" }}>Snippets</h4>
-        <OutlineButton title="NEW" onClick={() => {
-          dispatch(newSnippet());
-        }} />
+        <OutlineButton
+          title="NEW"
+          onClick={() => {
+            dispatch(newSnippet());
+          }}
+        />
       </div>
       <div className="snippets">
-        {Array.from(Array(30).keys()).map((item) => (
+        {snippets.map((snippet) => (
           <Snippet
-            key={item}
-            title={`Snippet Number #${item}`}
-            language={languages[item % languages.length]}
+            key={snippet.id}
+            snippet={snippet}
+            onClick={() => {
+              dispatch(setSelectedSnippet(snippet.id));
+            }}
           />
         ))}
       </div>

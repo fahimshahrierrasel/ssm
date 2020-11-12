@@ -1,13 +1,9 @@
-import { IDropdownItem, IMeta } from "./models";
-
-function instanceOfIMeta(obj: any): obj is IMeta {
-  return "name" in obj;
-}
+import { IDropdownItem } from "./models";
 
 export const arrayToItems = (items: any[]): IDropdownItem[] => {
   return items.map((item, index) => {
-    if (instanceOfIMeta(item)) {
-      return { key: index, value: item.name } as IDropdownItem;
+    if (typeof item !== "string") {
+      return { key: item.id, value: item.name } as IDropdownItem;
     }
     return { key: index, value: item } as IDropdownItem;
   });

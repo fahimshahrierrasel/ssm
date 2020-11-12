@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IFolder, ISnippet, ITag } from "../../models";
+import { IFolder, ISimpleSnippet, ISnippet, ITag } from "../../models";
 import { AppThunk } from "../store";
 import { languages } from "../../constants";
+import { v4 as uuidv4 } from "uuid";
 
 interface ISnippetReducer {
   snippets: ISnippet[];
@@ -50,11 +51,19 @@ export const {
 export default snippetSlice.reducer;
 
 // Thunk Actions
-export const createSnippet = (newSnippet: ISnippet): AppThunk => async (
+export const createSnippet = (newSnippet: ISimpleSnippet): AppThunk => async (
   dispatch
 ) => {
   try {
-    dispatch(addSnippet(newSnippet));
+    dispatch(
+      addSnippet({
+        ...newSnippet,
+        id: uuidv4(),
+        is_favourite: false,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as ISnippet)
+    );
   } catch (err) {}
 };
 

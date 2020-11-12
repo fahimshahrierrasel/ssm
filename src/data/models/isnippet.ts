@@ -3,10 +3,18 @@ export interface ISnippet {
   name: string;
   snippet: string;
   language: string;
-  folder: string;
-  tags: Map<string, string>;
+  folder: string | null;
+  tags: string[] | null;
   is_favourite: boolean;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date;
+  created_at: Date | number;
+  updated_at: Date | number;
+  deleted_at: Date | number;
+}
+
+export interface ISimpleSnippet {
+  name: string;
+  snippet: string;
+  language: string;
+  folder: string | null;
+  tags: string[] | null;
 }
