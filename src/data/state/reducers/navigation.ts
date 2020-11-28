@@ -10,11 +10,11 @@ const navigationSlice = createSlice({
     login: (state, action: PayloadAction) => {
       state.location = navigationsPath.SIGN_IN
     },
+    snippetHome: (state, action: PayloadAction) => {
+      state.location = navigationsPath.APP;
+    },
     snippetForm: (state, action: PayloadAction) => {
       state.location = navigationsPath.FORM;
-    },
-    discardSnippet: (state, action: PayloadAction) => {
-      state.location = navigationsPath.APP;
     },
     about: (state, action: PayloadAction) => {
       state.location = navigationsPath.ABOUT;
@@ -33,7 +33,7 @@ const navigationSlice = createSlice({
 
 export const {
   snippetForm,
-  discardSnippet,
+  snippetHome,
   about,
   settings,
   showLoader,

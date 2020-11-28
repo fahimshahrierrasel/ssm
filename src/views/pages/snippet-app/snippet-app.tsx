@@ -1,6 +1,4 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../data/state/reducers";
+import React, { useState } from "react";
 import Sidebar from "../../components/sidebar";
 import SnippetDetails from "../../components/snippet-details";
 import SnippetForm from "../../components/snippet-form";
@@ -8,12 +6,17 @@ import SnippetList from "../../components/snippet-list";
 import "./snippet-app.scss";
 
 const SnippetApp = () => {
-  const { location } = useSelector((state: RootState) => state.navigation);
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+
   return (
     <div className="snippet-app">
       <Sidebar />
-      <SnippetList />
-      {location === "new" ? <SnippetForm /> : <SnippetDetails />}
+      <SnippetList openForm={() => setIsFormOpen(true)} />
+      {isFormOpen ? (
+        <SnippetForm closeForm={() => setIsFormOpen(false)} />
+      ) : (
+        <SnippetDetails />
+      )}
     </div>
   );
 };

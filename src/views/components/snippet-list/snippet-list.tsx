@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import OutlineButton from "../outline-button";
 import OutlineInput from "../outline-input";
 import Snippet from "../snippet/snippet";
 import "./snippet-list.scss";
 import {
-  snippetForm,
   setSelectedSnippet,
   RootState,
 } from "../../../data/state/reducers";
 
-const SnippetList = () => {
+interface ISnippetListProps {
+  openForm: Function;
+}
+
+const SnippetList = ({ openForm }: ISnippetListProps) => {
   const dispatch = useDispatch();
   const { snippets } = useSelector((state: RootState) => state.snippets);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +34,7 @@ const SnippetList = () => {
         <OutlineButton
           title="NEW"
           onClick={() => {
-            dispatch(snippetForm());
+            openForm();
           }}
         />
       </div>
@@ -47,6 +51,10 @@ const SnippetList = () => {
       </div>
     </div>
   );
+};
+
+SnippetList.propTypes = {
+  openForm: PropTypes.func,
 };
 
 export default SnippetList;

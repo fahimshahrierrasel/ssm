@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { IDropdownItem, ISimpleSnippet } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
 import {
-  discardSnippet,
+  snippetHome,
   RootState,
   createSnippet,
 } from "../../../data/state/reducers";
@@ -15,7 +16,11 @@ import OutlineButton from "../outline-button";
 import { useDispatch } from "react-redux";
 import { arrayToItems } from "../../../data/helpers";
 
-const SnippetForm = () => {
+interface ISnippetFormProps {
+  closeForm: Function;
+}
+
+const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
   const dispatch = useDispatch();
   const [folder, setFolder] = useState<IDropdownItem | null>(null);
   const [snippetName, setSnippetName] = useState<string>("");
@@ -47,7 +52,7 @@ const SnippetForm = () => {
       } as ISimpleSnippet)
     );
 
-    dispatch(discardSnippet());
+    dispatch(snippetHome());
   };
 
   return (
@@ -63,7 +68,7 @@ const SnippetForm = () => {
           <OutlineButton
             title="CANCEL"
             onClick={() => {
-              dispatch(discardSnippet());
+              closeForm();
             }}
           />
         </div>
@@ -119,6 +124,10 @@ const SnippetForm = () => {
       </div>
     </div>
   );
+};
+
+SnippetForm.propTypes = {
+  closeForm: PropTypes.func,
 };
 
 export default SnippetForm;
