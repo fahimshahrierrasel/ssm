@@ -5,7 +5,7 @@ import OutlineInput from "../outline-input";
 import Snippet from "../snippet/snippet";
 import "./snippet-list.scss";
 import {
-  newSnippet,
+  snippetForm,
   setSelectedSnippet,
   RootState,
 } from "../../../data/state/reducers";
@@ -30,7 +30,7 @@ const SnippetList = () => {
         <OutlineButton
           title="NEW"
           onClick={() => {
-            dispatch(newSnippet());
+            dispatch(snippetForm());
           }}
         />
       </div>

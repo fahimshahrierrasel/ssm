@@ -1,25 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { navigationsPath } from "../../constants";
 
-const initialState = { location: "", loading: false };
+const initialState = { location:navigationsPath.SIGN_IN, loading: false };
 
 const navigationSlice = createSlice({
   name: "navigations",
   initialState: initialState,
   reducers: {
-    newSnippet: (state, action: PayloadAction) => {
-      state.location = "new";
+    login: (state, action: PayloadAction) => {
+      state.location = navigationsPath.SIGN_IN
     },
-    editSnippet: (state, action: PayloadAction) => {
-      state.location = "edit";
+    snippetForm: (state, action: PayloadAction) => {
+      state.location = navigationsPath.FORM;
     },
     discardSnippet: (state, action: PayloadAction) => {
-      state.location = "";
+      state.location = navigationsPath.APP;
     },
     about: (state, action: PayloadAction) => {
-      state.location = "about";
+      state.location = navigationsPath.ABOUT;
     },
     settings: (state, action: PayloadAction) => {
-      state.location = "settings";
+      state.location = navigationsPath.SETTINGS;
     },
     showLoader: (state, action: PayloadAction) => {
       state.loading = true;
@@ -31,8 +32,7 @@ const navigationSlice = createSlice({
 });
 
 export const {
-  newSnippet,
-  editSnippet,
+  snippetForm,
   discardSnippet,
   about,
   settings,

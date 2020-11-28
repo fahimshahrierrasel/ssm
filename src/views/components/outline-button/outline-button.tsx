@@ -5,11 +5,15 @@ import "./outline-button.scss";
 interface IOutlineButtonProps {
   title: string;
   onClick: Function;
+  style: object | null;
 }
 
-const OutlineButton = ({ title, onClick }: IOutlineButtonProps) => {
+const OutlineButton = ({ title, onClick, style }: IOutlineButtonProps) => {
   return (
-    <button className="outline-button" onClick={(e) => onClick()}>
+    <button
+      className="outline-button"
+      style={{ ...style }}
+      onClick={(e) => onClick()}>
       {title}
     </button>
   );
@@ -18,6 +22,11 @@ const OutlineButton = ({ title, onClick }: IOutlineButtonProps) => {
 OutlineButton.propTypes = {
   title: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  style: PropTypes.object,
+};
+
+OutlineButton.defaultProps = {
+  style: {},
 };
 
 export default OutlineButton;

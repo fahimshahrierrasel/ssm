@@ -7,6 +7,7 @@ interface IOutlineInputProps {
   value: any;
   onChange: Function;
   style: object | null;
+  isPassword: boolean;
 }
 
 const OutlineInput = ({
@@ -14,11 +15,13 @@ const OutlineInput = ({
   value,
   onChange,
   style,
+  isPassword,
 }: IOutlineInputProps) => {
   return (
     <input
       className="outline-input"
       style={{ ...style }}
+      type={isPassword ? "password" : "text"}
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -31,10 +34,12 @@ OutlineInput.propTypes = {
   value: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   style: PropTypes.object,
+  isPassword: PropTypes.bool,
 };
 
 OutlineInput.defaultProps = {
-	style: {}
+  style: {},
+  isPassword: false,
 };
 
 export default OutlineInput;

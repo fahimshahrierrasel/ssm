@@ -38,3 +38,11 @@ export const languages = [
   "xml",
   "yaml",
 ];
+
+export const navigationsPath = {
+  SIGN_IN: "signin",
+  FORM: "form",
+  APP: "",
+  ABOUT: "about",
+  SETTINGS: "settings"
+}
