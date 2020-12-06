@@ -5,7 +5,9 @@ import { RootState } from "../../../data/state/reducers";
 import { useSelector } from "react-redux";
 
 const SnippetDetails = () => {
-  const { selectedSnippet } = useSelector((state: RootState) => state.snippets);
+  const { selectedSnippet, folders, tags } = useSelector(
+    (state: RootState) => state.snippets
+  );
   return !selectedSnippet ? (
     <EmptySnippet />
   ) : (
@@ -15,12 +17,19 @@ const SnippetDetails = () => {
         <span className="language">{selectedSnippet.language}</span>
         <div className="folder">
           <span>Folder:</span>
-          <span>{selectedSnippet.folder}</span>
+          <span>
+            {
+              folders.find((folder) => folder.id === selectedSnippet.folder)
+                ?.name
+            }
+          </span>
         </div>
 
         <div className="tags">
           <span>Tags:</span>
-          {selectedSnippet.tags?.join(", ")}
+          {selectedSnippet.tags
+            ?.map((sTag) => tags.find((tag) => tag.id === sTag)?.name)
+            .join(", ")}
         </div>
       </div>
       <div className="editor">

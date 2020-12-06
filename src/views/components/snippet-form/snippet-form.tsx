@@ -1,15 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { IDropdownItem, ISimpleSnippet } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import {
-  snippetHome,
-  RootState,
-  createSnippet,
-} from "../../../data/state/reducers";
+import { RootState, createSnippet } from "../../../data/state/reducers";
 import "./snippet-form.scss";
 import MonacoEditor from "react-monaco-editor";
 import OutlineButton from "../outline-button";
@@ -46,14 +42,19 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
       createSnippet({
         name: snippetName,
         snippet: snippetText,
-        folder: folder?.value,
-        tags: selectedTags?.map((st) => st.value),
+        folder: folder?.key,
+        tags: selectedTags?.map((st) => st.key),
         language: language?.value,
       } as ISimpleSnippet)
     );
 
-    dispatch(snippetHome());
+    closeForm();
   };
+
+  useEffect(() => {
+    setLanguage(arrayToItems(languages)[0]);
+    return () => {};
+  }, [languages]);
 
   return (
     <div className="snippet-form">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import OutlineButton from "../outline-button";
@@ -8,6 +8,7 @@ import "./snippet-list.scss";
 import {
   setSelectedSnippet,
   RootState,
+  getSnippets,
 } from "../../../data/state/reducers";
 
 interface ISnippetListProps {
@@ -18,6 +19,11 @@ const SnippetList = ({ openForm }: ISnippetListProps) => {
   const dispatch = useDispatch();
   const { snippets } = useSelector((state: RootState) => state.snippets);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    dispatch(getSnippets());
+    return () => {};
+  }, [dispatch]);
 
   return (
     <div className="snippet-list">

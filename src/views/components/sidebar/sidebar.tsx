@@ -27,18 +27,14 @@ const Sidebar = () => {
     (state: RootState) => state.snippets
   );
 
-  
-  const loadSidebarData = () => {
-    dispatch(getFolders());
-    dispatch(getTags());
-  };
-
   useEffect(() => {
+    const loadSidebarData = () => {
+      dispatch(getFolders());
+      dispatch(getTags());
+    };
     loadSidebarData();
     return () => {};
-  }, []);
-
-  
+  }, [dispatch]);
 
   return (
     <div className="sidebar">

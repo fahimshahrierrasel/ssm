@@ -40,7 +40,7 @@ const OutlineMultiselect = ({
           }}>
           <option>Select</option>
           {items
-            .filter((item) => !selectedItems.includes(item))
+            .filter((item) => !selectedItems.some((sItem) => sItem.key === item.key))
             .map((item) => (
               <option key={item.key} value={item.key}>
                 {item.value}

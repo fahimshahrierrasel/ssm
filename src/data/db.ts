@@ -1,10 +1,11 @@
 import Firebase from "./firebase";
-import { IFolder, ITag } from "./models";
+import { IFolder, ISnippet, ITag } from "./models";
 
 const firebase = new Firebase();
 const collections = {
   FOLDER: "folders",
   TAG: "tags",
+  SNIPPET: "snippets",
 };
 
 const db = {
@@ -23,6 +24,16 @@ const db = {
     return {
       ...tag,
       id: tagRef.id,
+    };
+  },
+  createSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
+    console.log(snippet);
+    const snippetRef = await firebase.db
+      .collection(collections.SNIPPET)
+      .add(snippet);
+    return {
+      ...snippet,
+      id: snippetRef.id,
     };
   },
   getFolders: async (): Promise<IFolder[]> => {
@@ -50,6 +61,20 @@ const db = {
       } as ITag);
     });
     return tags;
+  },
+  getSnippets: async (): Promise<ISnippet[]> => {
+    const snippetSnapshot = await firebase.db
+      .collection(collections.SNIPPET)
+      .get();
+    const snippets: ISnippet[] = [];
+    snippetSnapshot.forEach((doc) => {
+      const data = doc.data();
+      snippets.push({
+        ...data,
+        id: doc.id,
+      } as ISnippet);
+    });
+    return snippets;
   },
 };
 

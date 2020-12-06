@@ -3,7 +3,6 @@ import { IFolder, ISimpleSnippet, ISnippet, ITag } from "../../models";
 import { AppThunk } from "../store";
 import { languages } from "../../constants";
 import { orderBy } from "lodash";
-import { v4 as uuidv4 } from "uuid";
 import db from "../../db";
 
 interface ISnippetReducer {
@@ -26,8 +25,12 @@ const snippetSlice = createSlice({
   name: "snippets",
   initialState: initailState,
   reducers: {
-    addSnippet: (state, action: PayloadAction<ISnippet>) => {
-      state.snippets = [...state.snippets, action.payload];
+    addSnippets: (state, action: PayloadAction<ISnippet[]>) => {
+      state.snippets = orderBy(
+        [...state.snippets, ...action.payload],
+        ["created_at"],
+        ["desc"]
+      );
     },
     setSelectedSnippet: (state, action: PayloadAction<string>) => {
       state.selectedSnippet = state.snippets.find(
@@ -52,7 +55,7 @@ const snippetSlice = createSlice({
 });
 
 export const {
-  addSnippet,
+  addSnippets,
   setSelectedSnippet,
   addFolders,
   addTags,
@@ -65,16 +68,16 @@ export const createSnippet = (newSnippet: ISimpleSnippet): AppThunk => async (
   dispatch
 ) => {
   try {
-    dispatch(
-      addSnippet({
-        ...newSnippet,
-        id: uuidv4(),
-        is_favourite: false,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as ISnippet)
-    );
-  } catch (err) {}
+    const snippet = await db.createSnippet({
+      ...newSnippet,
+      is_favourite: false,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as ISnippet);
+    dispatch(addSnippets([snippet]));
+  } catch (err) {
+    console.error("Error at creating snippet", err);
+  }
 };
 
 export const createFolder = (newFolder: IFolder): AppThunk => async (
@@ -121,5 +124,14 @@ export const getTags = (): AppThunk => async (dispatch) => {
     dispatch(addTags(tags));
   } catch (err) {
     console.error("Error at fetching tags", err);
+  }
+};
+
+export const getSnippets = (): AppThunk => async (dispatch) => {
+  try {
+    const snippets = await db.getSnippets();
+    dispatch(addSnippets(snippets));
+  } catch (err) {
+    console.error("Error at fetching snippets", err);
   }
 };
