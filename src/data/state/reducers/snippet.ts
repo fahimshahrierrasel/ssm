@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IFolder, ISimpleSnippet, ISnippet, ITag } from "../../models";
 import { AppThunk } from "../store";
 import { languages } from "../../constants";
+import { orderBy } from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import db from "../../db";
 
 interface ISnippetReducer {
   snippets: ISnippet[];
@@ -32,11 +34,19 @@ const snippetSlice = createSlice({
         (snippet) => snippet.id === action.payload
       ) as ISnippet;
     },
-    addFolder: (state, action: PayloadAction<IFolder>) => {
-      state.folders = [...state.folders, action.payload];
+    addFolders: (state, action: PayloadAction<IFolder[]>) => {
+      state.folders = orderBy(
+        [...state.folders, ...action.payload],
+        ["name"],
+        ["asc"]
+      );
     },
-    addTag: (state, action: PayloadAction<ITag>) => {
-      state.tags = [...state.tags, action.payload];
+    addTags: (state, action: PayloadAction<ITag[]>) => {
+      state.tags = orderBy(
+        [...state.tags, ...action.payload],
+        ["name"],
+        ["asc"]
+      );
     },
   },
 });
@@ -44,8 +54,8 @@ const snippetSlice = createSlice({
 export const {
   addSnippet,
   setSelectedSnippet,
-  addFolder,
-  addTag,
+  addFolders,
+  addTags,
 } = snippetSlice.actions;
 
 export default snippetSlice.reducer;
@@ -71,12 +81,45 @@ export const createFolder = (newFolder: IFolder): AppThunk => async (
   dispatch
 ) => {
   try {
-    dispatch(addFolder(newFolder));
-  } catch (err) {}
+    const folder = await db.createFolder({
+      ...newFolder,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    });
+    dispatch(addFolders([folder]));
+  } catch (err) {
+    console.error("Error at creating folder", err);
+  }
+};
+
+export const getFolders = (): AppThunk => async (dispatch) => {
+  try {
+    const folders = await db.getFolders();
+    dispatch(addFolders(folders));
+  } catch (err) {
+    console.error("Error at fetching folders", err);
+  }
 };
 
 export const createTag = (newTag: ITag): AppThunk => async (dispatch) => {
   try {
-    dispatch(addTag(newTag));
-  } catch (err) {}
+    const tag = await db.createTag({
+      ...newTag,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    });
+
+    dispatch(addTags([tag]));
+  } catch (err) {
+    console.error("Error at creating tag", err);
+  }
+};
+
+export const getTags = (): AppThunk => async (dispatch) => {
+  try {
+    const tags = await db.getTags();
+    dispatch(addTags(tags));
+  } catch (err) {
+    console.error("Error at fetching tags", err);
+  }
 };

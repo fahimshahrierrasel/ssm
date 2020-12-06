@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import OutlineButton from "../outline-button";
-import { v4 as uuidv4 } from "uuid";
 import "./sidebar.scss";
 import { capitalize } from "lodash";
 import Modal from "../modal";
 import Portal from "../../portal";
 import SimpleForm from "../simple-form";
 import OutlineItem from "../outline-item";
-import { RootState } from "../../../data/state/reducers";
-import { addFolder, addTag } from "../../../data/state/reducers/snippet";
+import {
+  createFolder,
+  createTag,
+  getFolders,
+  getTags,
+  RootState,
+} from "../../../data/state/reducers";
+import { IFolder, ITag } from "../../../data/models";
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
   const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(
     false
   );
@@ -21,7 +27,18 @@ const Sidebar = () => {
     (state: RootState) => state.snippets
   );
 
-  const dispatch = useDispatch();
+  
+  const loadSidebarData = () => {
+    dispatch(getFolders());
+    dispatch(getTags());
+  };
+
+  useEffect(() => {
+    loadSidebarData();
+    return () => {};
+  }, []);
+
+  
 
   return (
     <div className="sidebar">
@@ -100,12 +117,9 @@ const Sidebar = () => {
               placeholder="Folder Name"
               onSave={(fieldValue: string) => {
                 dispatch(
-                  addFolder({
-                    id: uuidv4(),
+                  createFolder({
                     name: fieldValue,
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                  })
+                  } as IFolder)
                 );
                 setShowCreateFolderModal(false);
               }}
@@ -122,12 +136,9 @@ const Sidebar = () => {
               placeholder="Tag Name"
               onSave={(fieldValue: string) => {
                 dispatch(
-                  addTag({
-                    id: uuidv4(),
+                  createTag({
                     name: fieldValue,
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                  })
+                  } as ITag)
                 );
                 setShowCreateTagModal(false);
               }}
