@@ -1,10 +1,16 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "./snippet-details.scss";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { RootState } from "../../../data/state/reducers";
 import { useSelector } from "react-redux";
+import OutlineButton from "../outline-button";
 
-const SnippetDetails = () => {
+interface ISnippetDetailsProps {
+  openForm: Function;
+}
+
+const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
   const { selectedSnippet, folders, tags } = useSelector(
     (state: RootState) => state.snippets
   );
@@ -13,7 +19,16 @@ const SnippetDetails = () => {
   ) : (
     <div className="snippet-details">
       <div className="info">
-        <span className="title">{selectedSnippet.name}</span>
+        <div className="title">
+          <span>{selectedSnippet.name}</span>
+          <OutlineButton
+            style={{ height: "25px" }}
+            title="Edit"
+            onClick={() => {
+              openForm()
+            }}
+          />
+        </div>
         <span className="language">{selectedSnippet.language}</span>
         <div className="folder">
           <span>Folder:</span>
@@ -53,6 +68,10 @@ const EmptySnippet = () => {
       </div>
     </div>
   );
+};
+
+SnippetDetails.propTypes = {
+  openForm: PropTypes.func,
 };
 
 export default SnippetDetails;

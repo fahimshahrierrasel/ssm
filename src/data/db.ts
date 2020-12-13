@@ -27,7 +27,6 @@ const db = {
     };
   },
   createSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
-    console.log(snippet);
     const snippetRef = await firebase.db
       .collection(collections.SNIPPET)
       .add(snippet);
@@ -35,6 +34,14 @@ const db = {
       ...snippet,
       id: snippetRef.id,
     };
+  },
+  updateSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
+    const { id, ...updateSnippet } = snippet;
+    await firebase.db
+      .collection(collections.SNIPPET)
+      .doc(id)
+      .update(updateSnippet);
+    return snippet;
   },
   getFolders: async (): Promise<IFolder[]> => {
     const folderSnapshot = await firebase.db

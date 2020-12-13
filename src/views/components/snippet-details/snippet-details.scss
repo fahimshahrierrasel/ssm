@@ -9,8 +9,12 @@
     grid-template-rows: repeat(4, auto);
 
     .title {
-      font-size: 20px;
-      font-weight: bold;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      span {
+        font-size: 20px;
+        font-weight: bold;
+      }
     }
 
     .folder {

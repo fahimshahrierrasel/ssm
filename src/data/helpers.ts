@@ -5,6 +5,6 @@ export const arrayToItems = (items: any[]): IDropdownItem[] => {
     if (typeof item !== "string") {
       return { key: item.id, value: item.name } as IDropdownItem;
     }
-    return { key: index, value: item } as IDropdownItem;
+    return { key: item.toLowerCase(), value: item } as IDropdownItem;
   });
 };

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import { IDropdownItem, ISimpleSnippet } from "../../../data/models";
+import { IDropdownItem, ISnippet, SimpleSnippet } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import { RootState, createSnippet } from "../../../data/state/reducers";
+import { RootState, createOrUpdateSnippet } from "../../../data/state/reducers";
 import "./snippet-form.scss";
 import MonacoEditor from "react-monaco-editor";
 import OutlineButton from "../outline-button";
@@ -14,15 +14,14 @@ import { arrayToItems } from "../../../data/helpers";
 
 interface ISnippetFormProps {
   closeForm: Function;
+  snippet: ISnippet | null;
 }
 
-const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
+const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
   const dispatch = useDispatch();
-  const [folder, setFolder] = useState<IDropdownItem | null>(null);
-  const [snippetName, setSnippetName] = useState<string>("");
-  const [language, setLanguage] = useState<IDropdownItem | null>(null);
-  const [selectedTags, setSelectedTags] = useState<IDropdownItem[]>([]);
-  const [snippetText, setSnippetText] = useState("");
+  const [eSnippet, setESnippet] = useState<ISnippet>(
+    snippet ?? new SimpleSnippet()
+  );
 
   const { folders, tags, languages } = useSelector(
     (state: RootState) => state.snippets
@@ -30,31 +29,16 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
 
   const onSaveClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: Need proper validation
-    if (snippetName.length < 3) {
+    if (eSnippet.name.length < 3) {
       alert("Name must be longer than 3+");
     }
 
-    if (snippetText.length < 3) {
+    if (eSnippet.snippet.length < 3) {
       alert("Snippet must be longer than 3+");
     }
-
-    dispatch(
-      createSnippet({
-        name: snippetName,
-        snippet: snippetText,
-        folder: folder?.key,
-        tags: selectedTags?.map((st) => st.key),
-        language: language?.value,
-      } as ISimpleSnippet)
-    );
-
+    dispatch(createOrUpdateSnippet(eSnippet));
     closeForm();
   };
-
-  useEffect(() => {
-    setLanguage(arrayToItems(languages)[0]);
-    return () => {};
-  }, [languages]);
 
   return (
     <div className="snippet-form">
@@ -62,8 +46,13 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
         <div className="name">
           <OutlineInput
             placeholder="Snippet Name"
-            value={snippetName}
-            onChange={(newVal: string) => setSnippetName(newVal)}
+            value={eSnippet.name}
+            onChange={(newVal: string) =>
+              setESnippet({
+                ...eSnippet,
+                name: newVal,
+              })
+            }
           />
           <OutlineButton title="SAVE" onClick={onSaveClick} />
           <OutlineButton
@@ -78,9 +67,16 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
           <label>Folder</label>
           <OutlineDropdown
             items={arrayToItems(folders)}
-            selected={folder}
+            selected={
+              arrayToItems(folders).find(
+                (item) => item.key === eSnippet.folder
+              ) ?? null
+            }
             onChange={(newVal: IDropdownItem) => {
-              setFolder(newVal);
+              setESnippet({
+                ...eSnippet,
+                folder: newVal.key,
+              });
             }}
           />
         </div>
@@ -89,9 +85,16 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
           <label>Language</label>
           <OutlineDropdown
             items={arrayToItems(languages)}
-            selected={language ?? arrayToItems(languages)[0]}
+            selected={
+              arrayToItems(languages).find(
+                (item) => item.key === eSnippet.language
+              ) ?? arrayToItems(languages)[0]
+            }
             onChange={(newVal: IDropdownItem) => {
-              setLanguage(newVal);
+              setESnippet({
+                ...eSnippet,
+                language: newVal.key,
+              });
             }}
           />
         </div>
@@ -100,9 +103,14 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
           <label>Tags</label>
           <OutlineMultiselect
             items={arrayToItems(tags)}
-            selectedItems={selectedTags}
+            selectedItems={arrayToItems(tags).filter((item) =>
+              eSnippet.tags?.includes(item.key)
+            )}
             onItemChange={(updateItems: IDropdownItem[]) => {
-              setSelectedTags(updateItems);
+              setESnippet({
+                ...eSnippet,
+                tags: updateItems.map((item) => item.key),
+              });
             }}
           />
         </div>
@@ -110,8 +118,8 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
 
       <div className="snippet-editor">
         <MonacoEditor
-          language={language?.value ?? languages[0]}
-          value={snippetText}
+          language={eSnippet.language ?? languages[0]}
+          value={eSnippet.snippet}
           height="96%"
           options={{
             formatOnType: true,
@@ -120,7 +128,12 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
             automaticLayout: true,
             cursorStyle: "line",
           }}
-          onChange={(newValue) => setSnippetText(newValue)}
+          onChange={(newValue) =>
+            setESnippet({
+              ...eSnippet,
+              snippet: newValue,
+            })
+          }
         />
       </div>
     </div>
@@ -129,6 +142,7 @@ const SnippetForm = ({ closeForm }: ISnippetFormProps) => {
 
 SnippetForm.propTypes = {
   closeForm: PropTypes.func,
+  snippet: PropTypes.object,
 };
 
 export default SnippetForm;

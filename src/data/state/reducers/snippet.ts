@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IFolder, ISimpleSnippet, ISnippet, ITag } from "../../models";
+import { IFolder, ISnippet, ITag, SimpleSnippet } from "../../models";
 import { AppThunk } from "../store";
 import { languages } from "../../constants";
 import { orderBy } from "lodash";
@@ -32,6 +32,21 @@ const snippetSlice = createSlice({
         ["desc"]
       );
     },
+    updateSnippet: (state, action: PayloadAction<ISnippet>) => {
+      state.snippets = orderBy(
+        state.snippets.map((snippet) => {
+          if (snippet.id === action.payload.id) {
+            return {
+              ...snippet,
+              ...action.payload,
+            };
+          }
+          return snippet;
+        }),
+        ["created_at"],
+        ["desc"]
+      );
+    },
     setSelectedSnippet: (state, action: PayloadAction<string>) => {
       state.selectedSnippet = state.snippets.find(
         (snippet) => snippet.id === action.payload
@@ -56,6 +71,7 @@ const snippetSlice = createSlice({
 
 export const {
   addSnippets,
+  updateSnippet,
   setSelectedSnippet,
   addFolders,
   addTags,
@@ -64,17 +80,29 @@ export const {
 export default snippetSlice.reducer;
 
 // Thunk Actions
-export const createSnippet = (newSnippet: ISimpleSnippet): AppThunk => async (
+export const createOrUpdateSnippet = (newSnippet: ISnippet): AppThunk => async (
   dispatch
 ) => {
   try {
-    const snippet = await db.createSnippet({
-      ...newSnippet,
-      is_favourite: false,
-      created_at: new Date().getTime(),
-      updated_at: new Date().getTime(),
-    } as ISnippet);
-    dispatch(addSnippets([snippet]));
+    console.log(newSnippet);
+    let snippet = new SimpleSnippet();
+
+    if (newSnippet.id !== "") {
+      snippet = await db.updateSnippet({
+        ...newSnippet,
+        updated_at: new Date().getTime(),
+      });
+      dispatch(updateSnippet(snippet));
+      dispatch(setSelectedSnippet(snippet.id));
+    } else {
+      snippet = await db.createSnippet({
+        ...newSnippet,
+        is_favourite: false,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      });
+      dispatch(addSnippets([snippet]));
+    }
   } catch (err) {
     console.error("Error at creating snippet", err);
   }
