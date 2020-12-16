@@ -1,5 +1,7 @@
 import Firebase from "./firebase";
-import { IFolder, ISnippet, ITag } from "./models";
+import app from "firebase/app";
+import "firebase/firestore";
+import { IFolder, ISearchTerm, ISnippet, ITag } from "./models";
 
 const firebase = new Firebase();
 const collections = {
@@ -73,6 +75,29 @@ const db = {
     const snippetSnapshot = await firebase.db
       .collection(collections.SNIPPET)
       .get();
+    const snippets: ISnippet[] = [];
+    snippetSnapshot.forEach((doc) => {
+      const data = doc.data();
+      snippets.push({
+        ...data,
+        id: doc.id,
+      } as ISnippet);
+    });
+    return snippets;
+  },
+  searchSnippets: async (searchTerms: ISearchTerm[]): Promise<ISnippet[]> => {
+    let snippetRef:
+      | app.firestore.CollectionReference
+      | app.firestore.Query = firebase.db.collection(collections.SNIPPET);
+    searchTerms.forEach((searchTerm) => {
+      snippetRef = snippetRef.where(
+        searchTerm.propertyName,
+        searchTerm.operator as app.firestore.WhereFilterOp,
+        searchTerm.value
+      );
+    });
+
+    var snippetSnapshot = await snippetRef.get();
     const snippets: ISnippet[] = [];
     snippetSnapshot.forEach((doc) => {
       const data = doc.data();

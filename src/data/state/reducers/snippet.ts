@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IFolder, ISnippet, ITag, SimpleSnippet } from "../../models";
+import {
+  IFolder,
+  ISearchTerm,
+  ISnippet,
+  ITag,
+  SimpleSnippet,
+} from "../../models";
 import { AppThunk } from "../store";
 import { languages } from "../../constants";
 import { orderBy } from "lodash";
@@ -25,12 +31,16 @@ const snippetSlice = createSlice({
   name: "snippets",
   initialState: initailState,
   reducers: {
-    addSnippets: (state, action: PayloadAction<ISnippet[]>) => {
+    addSnippet: (state, action: PayloadAction<ISnippet>) => {
+      const updatedSnippets = [...state.snippets, action.payload];
       state.snippets = orderBy(
-        [...state.snippets, ...action.payload],
+        updatedSnippets,
         ["created_at"],
         ["desc"]
       );
+    },
+    addSnippets: (state, action: PayloadAction<ISnippet[]>) => {
+      state.snippets = orderBy(action.payload, ["created_at"], ["desc"]);
     },
     updateSnippet: (state, action: PayloadAction<ISnippet>) => {
       state.snippets = orderBy(
@@ -70,6 +80,7 @@ const snippetSlice = createSlice({
 });
 
 export const {
+  addSnippet,
   addSnippets,
   updateSnippet,
   setSelectedSnippet,
@@ -101,7 +112,7 @@ export const createOrUpdateSnippet = (newSnippet: ISnippet): AppThunk => async (
         created_at: new Date().getTime(),
         updated_at: new Date().getTime(),
       });
-      dispatch(addSnippets([snippet]));
+      dispatch(addSnippet(snippet));
     }
   } catch (err) {
     console.error("Error at creating snippet", err);
@@ -161,5 +172,61 @@ export const getSnippets = (): AppThunk => async (dispatch) => {
     dispatch(addSnippets(snippets));
   } catch (err) {
     console.error("Error at fetching snippets", err);
+  }
+};
+
+export const getFavouriteSnippets = (): AppThunk => async (dispatch) => {
+  try {
+    const searchTerm: ISearchTerm = {
+      propertyName: "is_favourite",
+      operator: "==",
+      value: true,
+    };
+    const snippets = await db.searchSnippets([searchTerm]);
+    dispatch(addSnippets(snippets));
+  } catch (err) {
+    console.error("Error at searching snippets", err);
+  }
+};
+
+export const getDeletedSnippets = (): AppThunk => async (dispatch) => {
+  try {
+    const searchTerm: ISearchTerm = {
+      propertyName: "deleted_at",
+      operator: ">=",
+      value: "",
+    };
+    const snippets = await db.searchSnippets([searchTerm]);
+    dispatch(addSnippets(snippets));
+  } catch (err) {
+    console.error("Error at searching snippets", err);
+  }
+};
+
+export const searchSnippets = (searchTerm: ISearchTerm): AppThunk => async (
+  dispatch
+) => {
+  try {
+    const snippets = await db.searchSnippets([searchTerm]);
+    dispatch(addSnippets(snippets));
+  } catch (err) {
+    console.error("Error at searching snippets", err);
+  }
+};
+
+
+export const searchSnippetsByTag = (tagId: string): AppThunk => async (
+  dispatch
+) => {
+  try {
+    const searchTerm: ISearchTerm = {
+      propertyName: "tags",
+      operator: "array-contains",
+      value: tagId,
+    };
+    const snippets = await db.searchSnippets([searchTerm]);
+    dispatch(addSnippets(snippets));
+  } catch (err) {
+    console.error("Error at searching snippets", err);
   }
 };

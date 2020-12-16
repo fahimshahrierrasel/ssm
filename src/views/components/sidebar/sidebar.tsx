@@ -10,11 +10,16 @@ import OutlineItem from "../outline-item";
 import {
   createFolder,
   createTag,
+  getDeletedSnippets,
+  getFavouriteSnippets,
   getFolders,
+  getSnippets,
   getTags,
   RootState,
+  searchSnippets,
+  searchSnippetsByTag,
 } from "../../../data/state/reducers";
-import { IFolder, ITag } from "../../../data/models";
+import { IFolder, ISearchTerm, ITag } from "../../../data/models";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -22,6 +27,7 @@ const Sidebar = () => {
     false
   );
   const [showCreateTagModal, setShowCreateTagModal] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<string>();
 
   const { folders, tags, languages } = useSelector(
     (state: RootState) => state.snippets
@@ -29,6 +35,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     const loadSidebarData = () => {
+      setSelectedItem("all");
       dispatch(getFolders());
       dispatch(getTags());
     };
@@ -41,9 +48,30 @@ const Sidebar = () => {
       <div className="sidebar-block library">
         <h3 className="sidebar-header">Library</h3>
         <div className="sidebar-item">
-          <OutlineItem title="All Snippets" onItemClick={() => {}} />
-          <OutlineItem title="Favourite" onItemClick={() => {}} />
-          <OutlineItem title="Trash" onItemClick={() => {}} />
+          <OutlineItem
+            title="All Snippets"
+            selected={selectedItem === "all"}
+            onItemClick={() => {
+              setSelectedItem("all");
+              dispatch(getSnippets());
+            }}
+          />
+          <OutlineItem
+            title="Favourite"
+            selected={selectedItem === "favourite"}
+            onItemClick={() => {
+              setSelectedItem("favourite");
+              dispatch(getFavouriteSnippets());
+            }}
+          />
+          <OutlineItem
+            title="Trash"
+            selected={selectedItem === "trash"}
+            onItemClick={() => {
+              setSelectedItem("trash");
+              dispatch(getDeletedSnippets());
+            }}
+          />
         </div>
       </div>
       <div className="sidebar-block folder">
@@ -61,7 +89,17 @@ const Sidebar = () => {
             <OutlineItem
               key={folder.id}
               title={folder.name}
-              onItemClick={() => {}}
+              selected={selectedItem === folder.id}
+              onItemClick={() => {
+                setSelectedItem(folder.id);
+                dispatch(
+                  searchSnippets({
+                    propertyName: "folder",
+                    operator: "==",
+                    value: folder.id,
+                  } as ISearchTerm)
+                );
+              }}
             />
           ))}
         </div>
@@ -81,7 +119,11 @@ const Sidebar = () => {
             <OutlineItem
               key={tag.id}
               title={capitalize(tag.name)}
-              onItemClick={() => {}}
+              selected={selectedItem === tag.id}
+              onItemClick={() => {
+                setSelectedItem(tag.id);
+                dispatch(searchSnippetsByTag(tag.id));
+              }}
               wrapped
             />
           ))}
@@ -94,7 +136,17 @@ const Sidebar = () => {
             <OutlineItem
               key={lang}
               title={capitalize(lang)}
-              onItemClick={() => {}}
+              selected={selectedItem === lang}
+              onItemClick={() => {
+                setSelectedItem(lang);
+                dispatch(
+                  searchSnippets({
+                    propertyName: "language",
+                    operator: "==",
+                    value: lang,
+                  } as ISearchTerm)
+                );
+              }}
               wrapped
             />
           ))}

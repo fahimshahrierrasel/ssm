@@ -3,3 +3,4 @@ export * from "./ifolder";
 export * from "./itag";
 export * from "./isnippet";
 export * from "./imeta";
+export * from "./isearch-term";
