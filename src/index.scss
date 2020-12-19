@@ -10,3 +10,8 @@
   padding: 0;
   margin: 0;
 }
+
+// Need to remove this before deployment.
+.firebase-emulator-warning{
+  display: none;
+}

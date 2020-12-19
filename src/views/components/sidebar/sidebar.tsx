@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import firebaseApp from "../../../data/firebase";
 import OutlineButton from "../outline-button";
 import "./sidebar.scss";
 import { capitalize } from "lodash";
@@ -32,6 +33,10 @@ const Sidebar = () => {
   const { folders, tags, languages } = useSelector(
     (state: RootState) => state.snippets
   );
+
+  const logoutUser = async () => {
+    await firebaseApp.auth.signOut();
+  };
 
   useEffect(() => {
     const loadSidebarData = () => {
@@ -154,7 +159,7 @@ const Sidebar = () => {
       </div>
 
       <div className="footer">
-        <OutlineButton title="PROFILE" onClick={() => {}} />
+        <OutlineButton title="SIGN OUT" onClick={logoutUser} />
         <OutlineButton title="SETTINGS" onClick={() => {}} />
       </div>
 

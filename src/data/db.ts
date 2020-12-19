@@ -1,9 +1,8 @@
-import Firebase from "./firebase";
+import firebase from "./firebase";
 import app from "firebase/app";
 import "firebase/firestore";
 import { IFolder, ISearchTerm, ISnippet, ITag } from "./models";
 
-const firebase = new Firebase();
 const collections = {
   FOLDER: "folders",
   TAG: "tags",

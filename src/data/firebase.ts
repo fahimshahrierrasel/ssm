@@ -1,4 +1,5 @@
 import app from "firebase/app";
+import "firebase/auth";
 import 'firebase/firestore';
 
 const firebaseConfig = {
@@ -14,13 +15,18 @@ const firebaseConfig = {
 
 class Firebase {
   db: app.firestore.Firestore;
+  auth: app.auth.Auth;
   constructor() {
     app.initializeApp(firebaseConfig);
     this.db = app.firestore();
+    this.auth = app.auth();
     if (window.location.hostname === "localhost") {
       this.db.useEmulator("localhost", 30101);
+      this.auth.useEmulator("http://localhost:30100/");
     }
   }
 }
 
-export default Firebase;
+const firebase = new Firebase();
+
+export default firebase;
