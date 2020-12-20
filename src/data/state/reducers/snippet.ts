@@ -33,11 +33,7 @@ const snippetSlice = createSlice({
   reducers: {
     addSnippet: (state, action: PayloadAction<ISnippet>) => {
       const updatedSnippets = [...state.snippets, action.payload];
-      state.snippets = orderBy(
-        updatedSnippets,
-        ["created_at"],
-        ["desc"]
-      );
+      state.snippets = orderBy(updatedSnippets, ["created_at"], ["desc"]);
     },
     addSnippets: (state, action: PayloadAction<ISnippet[]>) => {
       state.snippets = orderBy(action.payload, ["created_at"], ["desc"]);
@@ -63,18 +59,20 @@ const snippetSlice = createSlice({
       ) as ISnippet;
     },
     addFolders: (state, action: PayloadAction<IFolder[]>) => {
+      state.folders = orderBy(action.payload, ["name"], ["asc"]);
+    },
+    addFolder: (state, action: PayloadAction<IFolder>) => {
       state.folders = orderBy(
-        [...state.folders, ...action.payload],
+        [...state.folders, action.payload],
         ["name"],
         ["asc"]
       );
     },
     addTags: (state, action: PayloadAction<ITag[]>) => {
-      state.tags = orderBy(
-        [...state.tags, ...action.payload],
-        ["name"],
-        ["asc"]
-      );
+      state.tags = orderBy(action.payload, ["name"], ["asc"]);
+    },
+    addTag: (state, action: PayloadAction<ITag>) => {
+      state.tags = orderBy([...state.tags, action.payload], ["name"], ["asc"]);
     },
   },
 });
@@ -85,7 +83,9 @@ export const {
   updateSnippet,
   setSelectedSnippet,
   addFolders,
+  addFolder,
   addTags,
+  addTag,
 } = snippetSlice.actions;
 
 export default snippetSlice.reducer;
@@ -95,7 +95,6 @@ export const createOrUpdateSnippet = (newSnippet: ISnippet): AppThunk => async (
   dispatch
 ) => {
   try {
-    console.log(newSnippet);
     let snippet = new SimpleSnippet();
 
     if (newSnippet.id !== "") {
@@ -128,7 +127,7 @@ export const createFolder = (newFolder: IFolder): AppThunk => async (
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
     });
-    dispatch(addFolders([folder]));
+    dispatch(addFolder(folder));
   } catch (err) {
     console.error("Error at creating folder", err);
   }
@@ -151,7 +150,7 @@ export const createTag = (newTag: ITag): AppThunk => async (dispatch) => {
       updated_at: new Date().getTime(),
     });
 
-    dispatch(addTags([tag]));
+    dispatch(addTag(tag));
   } catch (err) {
     console.error("Error at creating tag", err);
   }
@@ -213,7 +212,6 @@ export const searchSnippets = (searchTerm: ISearchTerm): AppThunk => async (
     console.error("Error at searching snippets", err);
   }
 };
-
 
 export const searchSnippetsByTag = (tagId: string): AppThunk => async (
   dispatch

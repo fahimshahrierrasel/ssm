@@ -40,9 +40,6 @@ export const languages = [
 ];
 
 export const navigationsPath = {
-  SIGN_IN: "signin",
-  FORM: "form",
-  APP: "",
-  ABOUT: "about",
-  SETTINGS: "settings"
+  APP: "app",
+  PREFERENCES: "preferences",
 }

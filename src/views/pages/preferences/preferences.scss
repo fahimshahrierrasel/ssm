@@ -1,0 +1,32 @@
+.preferences {
+  height: 100vh;
+  padding: 20px;
+  display: grid;
+  grid-template-rows: auto 1fr 100px;
+
+  .perferences-header {
+    grid-row: 1;
+  }
+
+  .sections {
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .preferences-footer {
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: end;
+    .application-icon {
+      height: 100%;
+      display: grid;
+      justify-items: end;
+      img {
+        height: 80px;
+      }
+    }
+  }
+}
