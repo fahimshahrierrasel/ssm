@@ -15,7 +15,7 @@ A dead simple snippet manager with self hosting without any cost.
 - Sign in with the newly created email and password.
 
 #### How to deploy:
-You can deploy this app on platform like Netlify, Vercel, Firebase and etc without any penny.
+You can deploy this app on platform like **Netlify**, **Vercel**, **Firebase** and etc without any penny.
 Before deploying you need to create a Firebase project and enable `Authentication` and `Firestore`.
 - Add a `Web App` in firebase then you will get the firebase config which will be needed as environment variable when we deploy the app. Check [.env.example](./.env.example) to get the idea which key is needed.
 - Create an account from Firebase console with email and password. Which will be needed to login on the app after it is deploy.
