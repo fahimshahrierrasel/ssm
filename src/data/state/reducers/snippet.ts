@@ -101,20 +101,21 @@ export const createOrUpdateSnippet = (newSnippet: ISnippet): AppThunk => async (
       snippet = await db.updateSnippet({
         ...newSnippet,
         updated_at: new Date().getTime(),
-      });
+      } as ISnippet);
       dispatch(updateSnippet(snippet));
       dispatch(setSelectedSnippet(snippet.id));
     } else {
+      let { id, deleted_at, ...simpleSnippet } = newSnippet;
       snippet = await db.createSnippet({
-        ...newSnippet,
+        ...simpleSnippet,
         is_favourite: false,
         created_at: new Date().getTime(),
         updated_at: new Date().getTime(),
-      });
+      } as ISnippet);
       dispatch(addSnippet(snippet));
     }
   } catch (err) {
-    console.error("Error at creating snippet", err);
+    console.error("Error at creating/updating snippet", err);
   }
 };
 

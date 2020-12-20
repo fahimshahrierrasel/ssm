@@ -43,6 +43,6 @@ export class SimpleSnippet implements ISnippet {
     this.is_favourite = false;
     this.created_at = new Date().getTime();
     this.updated_at = new Date().getTime();
-    this.deleted_at = new Date();
+    this.deleted_at = new Date().getTime();
   }
 }

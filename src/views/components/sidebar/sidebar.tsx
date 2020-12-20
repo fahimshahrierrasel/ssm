@@ -119,7 +119,7 @@ const Sidebar = () => {
           {tags.map((tag) => (
             <OutlineItem
               key={tag.id}
-              title={capitalize(tag.name)}
+              title={tag.name}
               selected={selectedItem === tag.id}
               onItemClick={() => {
                 setSelectedItem(tag.id);
