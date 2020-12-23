@@ -1,16 +1,19 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import "./snippet-details.scss";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { RootState } from "../../../data/state/reducers";
+import { createOrUpdateSnippet, RootState } from "../../../data/state/reducers";
 import { useSelector } from "react-redux";
 import OutlineButton from "../outline-button";
+import assets from "../../../assets";
 
 interface ISnippetDetailsProps {
   openForm: Function;
 }
 
 const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
+  const dispatch = useDispatch();
   const { selectedSnippet, folders, tags } = useSelector(
     (state: RootState) => state.snippets
   );
@@ -20,12 +23,28 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
     <div className="snippet-details">
       <div className="info">
         <div className="title">
+          <img
+            src={
+              selectedSnippet.is_favourite
+                ? assets.FAVOURITE
+                : assets.YET_FAVOURITE
+            }
+            alt="is_favourite"
+            onClick={() => {
+              dispatch(
+                createOrUpdateSnippet({
+                  ...selectedSnippet,
+                  is_favourite: !selectedSnippet.is_favourite,
+                })
+              );
+            }}
+          />
           <span>{selectedSnippet.name}</span>
           <OutlineButton
             style={{ height: "25px" }}
             title="Edit"
             onClick={() => {
-              openForm()
+              openForm();
             }}
           />
         </div>
