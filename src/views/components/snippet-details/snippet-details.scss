@@ -28,6 +28,12 @@
         font-size: 20px;
         font-weight: bold;
       }
+
+      .action-buttons{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 5px;
+      }
     }
 
     .folder {

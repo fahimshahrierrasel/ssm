@@ -10,6 +10,7 @@ import { AppThunk } from "../store";
 import { languages } from "../../constants";
 import { orderBy } from "lodash";
 import db from "../../db";
+import { notDeletedFilter } from "../../helpers";
 
 interface ISnippetReducer {
   snippets: ISnippet[];
@@ -119,6 +120,25 @@ export const createOrUpdateSnippet = (newSnippet: ISnippet): AppThunk => async (
   }
 };
 
+export const deleteOrRestoreSnippet = (
+  seletedSnippet: ISnippet
+): AppThunk => async (dispatch) => {
+  try {
+    console.log("Got Delete Command");
+    const snippet = await db.restoreOrDeleteSnippet(seletedSnippet);
+    dispatch(updateSnippet(snippet));
+    dispatch(setSelectedSnippet(""));
+    // ToDo: Performance Issue
+    if (snippet.deleted_at) {
+      dispatch(getSnippets());
+    } else {
+      dispatch(getDeletedSnippets());
+    }
+  } catch (err) {
+    console.error("Error at deleting/restoring snippet", err);
+  }
+};
+
 export const createFolder = (newFolder: IFolder): AppThunk => async (
   dispatch
 ) => {
@@ -168,7 +188,8 @@ export const getTags = (): AppThunk => async (dispatch) => {
 
 export const getSnippets = (): AppThunk => async (dispatch) => {
   try {
-    const snippets = await db.getSnippets();
+    let snippets = await db.getSnippets();
+    snippets = snippets.filter(notDeletedFilter);
     dispatch(addSnippets(snippets));
   } catch (err) {
     console.error("Error at fetching snippets", err);
@@ -182,7 +203,8 @@ export const getFavouriteSnippets = (): AppThunk => async (dispatch) => {
       operator: "==",
       value: true,
     };
-    const snippets = await db.searchSnippets([searchTerm]);
+    let snippets = await db.searchSnippets([searchTerm]);
+    snippets = snippets.filter(notDeletedFilter);
     dispatch(addSnippets(snippets));
   } catch (err) {
     console.error("Error at searching snippets", err);
@@ -193,8 +215,8 @@ export const getDeletedSnippets = (): AppThunk => async (dispatch) => {
   try {
     const searchTerm: ISearchTerm = {
       propertyName: "deleted_at",
-      operator: ">=",
-      value: "",
+      operator: "!=",
+      value: null,
     };
     const snippets = await db.searchSnippets([searchTerm]);
     dispatch(addSnippets(snippets));
@@ -207,7 +229,8 @@ export const searchSnippets = (searchTerm: ISearchTerm): AppThunk => async (
   dispatch
 ) => {
   try {
-    const snippets = await db.searchSnippets([searchTerm]);
+    let snippets = await db.searchSnippets([searchTerm]);
+    snippets = snippets.filter(notDeletedFilter);
     dispatch(addSnippets(snippets));
   } catch (err) {
     console.error("Error at searching snippets", err);
@@ -223,7 +246,8 @@ export const searchSnippetsByTag = (tagId: string): AppThunk => async (
       operator: "array-contains",
       value: tagId,
     };
-    const snippets = await db.searchSnippets([searchTerm]);
+    let snippets = await db.searchSnippets([searchTerm]);
+    snippets = snippets.filter(notDeletedFilter);
     dispatch(addSnippets(snippets));
   } catch (err) {
     console.error("Error at searching snippets", err);

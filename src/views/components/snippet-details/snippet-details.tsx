@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import "./snippet-details.scss";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { createOrUpdateSnippet, RootState } from "../../../data/state/reducers";
+import {
+  createOrUpdateSnippet,
+  deleteOrRestoreSnippet,
+  RootState,
+} from "../../../data/state/reducers";
 import { useSelector } from "react-redux";
 import OutlineButton from "../outline-button";
 import assets from "../../../assets";
+import SimpleAlert from "../simple-alert";
 
 interface ISnippetDetailsProps {
   openForm: Function;
@@ -17,6 +22,9 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
   const { selectedSnippet, folders, tags } = useSelector(
     (state: RootState) => state.snippets
   );
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [showRestoreModal, setShowRestoreModal] = useState<boolean>(false);
+
   return !selectedSnippet ? (
     <EmptySnippet />
   ) : (
@@ -40,13 +48,41 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
             }}
           />
           <span>{selectedSnippet.name}</span>
-          <OutlineButton
-            style={{ height: "25px" }}
-            title="Edit"
-            onClick={() => {
-              openForm();
-            }}
-          />
+          <div className="action-buttons">
+            {selectedSnippet.deleted_at ? (
+              <OutlineButton
+                style={{
+                  height: "25px",
+                  color: "red",
+                  border: "1px solid red",
+                }}
+                title="Restore"
+                onClick={() => {
+                  setShowRestoreModal(true);
+                }}
+              />
+            ) : (
+              <OutlineButton
+                style={{
+                  height: "25px",
+                  color: "red",
+                  border: "1px solid red",
+                }}
+                title="Remove"
+                onClick={() => {
+                  setShowDeleteModal(true);
+                }}
+              />
+            )}
+
+            <OutlineButton
+              style={{ height: "25px" }}
+              title="Edit"
+              onClick={() => {
+                openForm();
+              }}
+            />
+          </div>
         </div>
         <span className="language">{selectedSnippet.language}</span>
         <div className="folder">
@@ -74,6 +110,32 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
           {selectedSnippet.snippet}
         </SyntaxHighlighter>
       </div>
+
+      {showDeleteModal && (
+        <SimpleAlert
+          description={`Do you want to delete ${selectedSnippet.name}?`}
+          acceptAction={async () => {
+            dispatch(deleteOrRestoreSnippet(selectedSnippet));
+            setShowDeleteModal(false);
+          }}
+          cancelAction={() => {
+            setShowDeleteModal(false);
+          }}
+        />
+      )}
+
+      {showRestoreModal && (
+        <SimpleAlert
+          description={`Do you want to restore ${selectedSnippet.name}?`}
+          acceptAction={async () => {
+            dispatch(deleteOrRestoreSnippet(selectedSnippet));
+            setShowRestoreModal(false);
+          }}
+          cancelAction={() => {
+            setShowRestoreModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

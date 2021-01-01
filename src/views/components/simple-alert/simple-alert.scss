@@ -1,0 +1,12 @@
+.simple-alert {
+  display: grid;
+  grid-template-rows: 1fr auto;
+
+  .alert-footer {
+    grid-row: 2;
+    display: grid;
+    justify-content: end;
+    grid-template-columns: repeat(2, 100px);
+    column-gap: 10px;
+  }
+}

@@ -1,5 +1,5 @@
 export interface ISearchTerm {
   propertyName: string;
   operator: string;
-  value: string | boolean | number;
+  value: string | boolean | number | null | undefined;
 }

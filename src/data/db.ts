@@ -1,6 +1,5 @@
 import firebase from "./firebase";
 import app from "firebase/app";
-import "firebase/firestore";
 import { IFolder, ISearchTerm, ISnippet, ITag } from "./models";
 
 const collections = {
@@ -43,6 +42,32 @@ const db = {
       .doc(id)
       .update(updateSnippet);
     return snippet;
+  },
+  restoreOrDeleteSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
+    const { id, ...updateSnippet } = snippet;
+    if (snippet.deleted_at) {
+      await firebase.db.collection(collections.SNIPPET).doc(id).update({
+        deleted_at: app.firestore.FieldValue.delete(),
+      });
+      const { deleted_at, ...restoreSnippet } = updateSnippet;
+      return {
+        ...restoreSnippet,
+        id,
+      } as ISnippet;
+    } else {
+      const deletedSnippet = {
+        ...updateSnippet,
+        deleted_at: new Date().getTime(),
+      };
+      await firebase.db
+        .collection(collections.SNIPPET)
+        .doc(id)
+        .update(deletedSnippet);
+      return {
+        ...deletedSnippet,
+        id,
+      } as ISnippet;
+    }
   },
   getFolders: async (): Promise<IFolder[]> => {
     const folderSnapshot = await firebase.db
