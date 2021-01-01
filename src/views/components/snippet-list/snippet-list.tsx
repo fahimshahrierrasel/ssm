@@ -36,24 +36,33 @@ const SnippetList = ({ openForm }: ISnippetListProps) => {
         }}
       />
       <div className="list-header">
-        <h4 style={{ padding: "5px" }}>Snippets</h4>
+        <h3>Snippets ({snippets.length})</h3>
         <OutlineButton
           title="NEW"
+          style={{ height: "25px" }}
           onClick={() => {
             openForm();
           }}
         />
       </div>
       <div className="snippets">
-        {snippets.map((snippet) => (
-          <Snippet
-            key={snippet.id}
-            snippet={snippet}
-            onClick={() => {
-              dispatch(setSelectedSnippet(snippet.id));
-            }}
-          />
-        ))}
+        {snippets
+          .filter((snippet) =>
+            searchQuery.trim().length < 0
+              ? true
+              : snippet.name
+                  .toLocaleLowerCase()
+                  .includes(searchQuery.trim().toLocaleLowerCase())
+          )
+          .map((snippet) => (
+            <Snippet
+              key={snippet.id}
+              snippet={snippet}
+              onClick={() => {
+                dispatch(setSelectedSnippet(snippet.id));
+              }}
+            />
+          ))}
       </div>
     </div>
   );

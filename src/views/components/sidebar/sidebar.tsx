@@ -121,11 +121,11 @@ const Sidebar = () => {
               key={tag.id}
               title={tag.name}
               selected={selectedItem === tag.id}
+              wrapped
               onItemClick={() => {
                 setSelectedItem(tag.id);
                 dispatch(searchSnippetsByTag(tag.id));
               }}
-              wrapped
             />
           ))}
         </div>

@@ -42,4 +42,4 @@ export const languages = [
 export const navigationsPath = {
   APP: "app",
   PREFERENCES: "preferences",
-}
+};
