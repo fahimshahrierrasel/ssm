@@ -7,8 +7,6 @@ import Loader from "../views/components/loader";
 import Preferences from "../views/pages/preferences";
 import SignIn from "../views/pages/sign-in";
 import SnippetApp from "../views/pages/snippet-app";
-import Portal from "../views/portal";
-import "./App.scss";
 
 function App() {
   const location = useNavigationStore((state) => state.location);
@@ -42,13 +40,9 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className="h-screen w-screen overflow-hidden bg-background">
       {getPage()}
-      {waiting && (
-        <Portal>
-          <Loader />
-        </Portal>
-      )}
+      {waiting && <Loader />}
     </div>
   );
 }

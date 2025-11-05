@@ -1,5 +1,4 @@
 import React from "react";
-import "./modal.scss";
 
 interface IModalProps {
   title: string;

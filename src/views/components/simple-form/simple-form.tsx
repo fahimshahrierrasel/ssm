@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import OutlineButton from "../outline-button";
 import OutlineInput from "../outline-input";
-import "./simple-form.scss";
 
 interface ISimpleForm {
   placeholder: string;

@@ -4,7 +4,6 @@ import assets from "../../../assets";
 import firebaseApp from "../../../data/firebase";
 import { useNavigationStore } from "../../../data/state/navigationStore";
 import OutlineButton from "../../components/outline-button";
-import "./preferences.scss";
 
 const Preferences = () => {
   const snippetHome = useNavigationStore((state) => state.snippetHome);

@@ -1,21 +1,32 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { capitalize } from "lodash";
+import {
+  FileText,
+  Heart,
+  Trash2,
+  Folder,
+  Plus,
+  Tag,
+  Code2,
+  Settings,
+  FolderOpen
+} from "lucide-react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import { useNavigationStore } from "../../../data/state/navigationStore";
 import { IFolder, ISearchTerm, ITag } from "../../../data/models";
-import OutlineButton from "../outline-button";
-import Modal from "../modal";
-import Portal from "../../portal";
-import SimpleForm from "../simple-form";
-import OutlineItem from "../outline-item";
-import "./sidebar.scss";
+import { Button } from "../../../components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Badge } from "../../../components/ui/badge";
+import { cn } from "../../../lib/utils";
 
 const Sidebar = () => {
-  const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(
-    false
-  );
-  const [showCreateTagModal, setShowCreateTagModal] = useState<boolean>(false);
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [showCreateTagModal, setShowCreateTagModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>();
+  const [folderName, setFolderName] = useState("");
+  const [tagName, setTagName] = useState("");
 
   const folders = useSnippetStore((state) => state.folders);
   const tags = useSnippetStore((state) => state.tags);
@@ -32,164 +43,272 @@ const Sidebar = () => {
   const preferences = useNavigationStore((state) => state.preferences);
 
   useEffect(() => {
-    const loadSidebarData = () => {
-      setSelectedItem("all");
-      getFolders();
-      getTags();
-    };
-    loadSidebarData();
-    return () => {};
-  }, [getFolders, getTags]);
+    setSelectedItem("all");
+    getFolders();
+    getTags();
+    getSnippets();
+  }, [getFolders, getTags, getSnippets]);
+
+  const handleCreateFolder = () => {
+    if (folderName.trim()) {
+      createFolder({ name: folderName.trim() } as IFolder);
+      setFolderName("");
+      setShowCreateFolderModal(false);
+    }
+  };
+
+  const handleCreateTag = () => {
+    if (tagName.trim()) {
+      createTag({ name: tagName.trim() } as ITag);
+      setTagName("");
+      setShowCreateTagModal(false);
+    }
+  };
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-block library">
-        <h3 className="sidebar-header">Library</h3>
-        <div className="sidebar-item">
-          <OutlineItem
-            title="All Snippets"
+    <div className="flex w-64 flex-col border-r bg-card">
+      {/* Header */}
+      <div className="border-b p-4">
+        <div className="flex items-center gap-2">
+          <Code2 className="h-6 w-6 text-primary" />
+          <h2 className="text-xl font-bold">Snippets</h2>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        {/* Library Section */}
+        <div className="space-y-1">
+          <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Library
+          </h3>
+          <NavItem
+            icon={<FileText className="h-4 w-4" />}
+            label="All Snippets"
             selected={selectedItem === "all"}
-            onItemClick={() => {
+            onClick={() => {
               setSelectedItem("all");
               getSnippets();
             }}
           />
-          <OutlineItem
-            title="Favourite"
+          <NavItem
+            icon={<Heart className="h-4 w-4" />}
+            label="Favourites"
             selected={selectedItem === "favourite"}
-            onItemClick={() => {
+            onClick={() => {
               setSelectedItem("favourite");
               getFavouriteSnippets();
             }}
           />
-          <OutlineItem
-            title="Trash"
+          <NavItem
+            icon={<Trash2 className="h-4 w-4" />}
+            label="Trash"
             selected={selectedItem === "trash"}
-            onItemClick={() => {
+            onClick={() => {
               setSelectedItem("trash");
               getDeletedSnippets();
             }}
           />
         </div>
-      </div>
-      <div className="sidebar-block folder">
-        <div className="sidebar-header">
-          <h3>Folders</h3>
-          <OutlineButton
-            title="ADD"
-            onClick={() => {
-              setShowCreateFolderModal(true);
-            }}
-          />
+
+        {/* Folders Section */}
+        <div className="space-y-1">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Folders
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setShowCreateFolderModal(true)}
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+          {folders.length === 0 ? (
+            <p className="px-2 text-xs text-muted-foreground">No folders yet</p>
+          ) : (
+            folders.map((folder) => (
+              <NavItem
+                key={folder.id}
+                icon={<FolderOpen className="h-4 w-4" />}
+                label={folder.name}
+                selected={selectedItem === folder.id}
+                onClick={() => {
+                  setSelectedItem(folder.id);
+                  searchSnippets({
+                    propertyName: "folder",
+                    operator: "==",
+                    value: folder.id,
+                  } as ISearchTerm);
+                }}
+              />
+            ))
+          )}
         </div>
-        <div className="sidebar-item">
-          {folders.map((folder) => (
-            <OutlineItem
-              key={folder.id}
-              title={folder.name}
-              selected={selectedItem === folder.id}
-              onItemClick={() => {
-                setSelectedItem(folder.id);
-                searchSnippets({
-                  propertyName: "folder",
-                  operator: "==",
-                  value: folder.id,
-                } as ISearchTerm);
-              }}
-            />
-          ))}
+
+        {/* Tags Section */}
+        <div className="space-y-1">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Tags
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setShowCreateTagModal(true)}
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+          {tags.length === 0 ? (
+            <p className="px-2 text-xs text-muted-foreground">No tags yet</p>
+          ) : (
+            <div className="flex flex-wrap gap-1 px-2">
+              {tags.map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant={selectedItem === tag.id ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelectedItem(tag.id);
+                    searchSnippetsByTag(tag.id);
+                  }}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="sidebar-block tag">
-        <div className="sidebar-header">
-          <h3>Tags</h3>
-          <OutlineButton
-            title="ADD"
-            onClick={() => {
-              setShowCreateTagModal(true);
-            }}
-          />
-        </div>
-        <div className="sidebar-item__wrap">
-          {tags.map((tag) => (
-            <OutlineItem
-              key={tag.id}
-              title={tag.name}
-              selected={selectedItem === tag.id}
-              wrapped
-              onItemClick={() => {
-                setSelectedItem(tag.id);
-                searchSnippetsByTag(tag.id);
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="sidebar-block language">
-        <h3 className="sidebar-header">Languages</h3>
-        <div className="sidebar-item__wrap">
-          {languages.map((lang) => (
-            <OutlineItem
-              key={lang}
-              title={capitalize(lang)}
-              selected={selectedItem === lang}
-              onItemClick={() => {
-                setSelectedItem(lang);
-                searchSnippets({
-                  propertyName: "language",
-                  operator: "==",
-                  value: lang,
-                } as ISearchTerm);
-              }}
-              wrapped
-            />
-          ))}
+
+        {/* Languages Section */}
+        <div className="space-y-1">
+          <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Languages
+          </h3>
+          <div className="flex flex-wrap gap-1 px-2">
+            {languages.slice(0, 20).map((lang) => (
+              <Badge
+                key={lang}
+                variant={selectedItem === lang ? "default" : "secondary"}
+                className="cursor-pointer text-xs"
+                onClick={() => {
+                  setSelectedItem(lang);
+                  searchSnippets({
+                    propertyName: "language",
+                    operator: "==",
+                    value: lang,
+                  } as ISearchTerm);
+                }}
+              >
+                {capitalize(lang)}
+              </Badge>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="footer">
-        <OutlineButton
-          title="Preferences"
-          onClick={() => {
-            preferences();
-          }}
-        />
+      {/* Footer */}
+      <div className="border-t p-4">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={preferences}
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          Preferences
+        </Button>
       </div>
 
-      {showCreateFolderModal && (
-        <Portal>
-          <Modal title="Create Folder">
-            <SimpleForm
-              placeholder="Folder Name"
-              onSave={(fieldValue: string) => {
-                createFolder({
-                  name: fieldValue,
-                } as IFolder);
-                setShowCreateFolderModal(false);
-              }}
-              onCancel={() => setShowCreateFolderModal(false)}
-            />
-          </Modal>
-        </Portal>
-      )}
+      {/* Create Folder Dialog */}
+      <Dialog open={showCreateFolderModal} onOpenChange={setShowCreateFolderModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Folder</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="folderName">Folder Name</Label>
+              <Input
+                id="folderName"
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+                placeholder="Enter folder name"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateFolder();
+                }}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowCreateFolderModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateFolder}>Create</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      {showCreateTagModal && (
-        <Portal>
-          <Modal title="Create Tag">
-            <SimpleForm
-              placeholder="Tag Name"
-              onSave={(fieldValue: string) => {
-                createTag({
-                  name: fieldValue,
-                } as ITag);
-                setShowCreateTagModal(false);
-              }}
-              onCancel={() => setShowCreateTagModal(false)}
-            />
-          </Modal>
-        </Portal>
-      )}
+      {/* Create Tag Dialog */}
+      <Dialog open={showCreateTagModal} onOpenChange={setShowCreateTagModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Tag</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tagName">Tag Name</Label>
+              <Input
+                id="tagName"
+                value={tagName}
+                onChange={(e) => setTagName(e.target.value)}
+                placeholder="Enter tag name"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateTag();
+                }}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowCreateTagModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateTag}>Create</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+};
+
+// Navigation Item Component
+const NavItem = ({
+  icon,
+  label,
+  selected,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+        selected
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      )}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
   );
 };
 
