@@ -1,5 +1,15 @@
 import firebase from "./firebase";
-import app from "firebase/app";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+  WhereFilterOp,
+  deleteField,
+} from "firebase/firestore";
 import { IFolder, ISearchTerm, ISnippet, ITag } from "./models";
 
 const collections = {
@@ -10,9 +20,10 @@ const collections = {
 
 const db = {
   createFolder: async (folder: IFolder): Promise<IFolder> => {
-    const folderRef = await firebase.db
-      .collection(collections.FOLDER)
-      .add(folder);
+    const folderRef = await addDoc(
+      collection(firebase.db, collections.FOLDER),
+      folder
+    );
 
     return {
       ...folder,
@@ -20,16 +31,17 @@ const db = {
     };
   },
   createTag: async (tag: ITag): Promise<ITag> => {
-    const tagRef = await firebase.db.collection(collections.TAG).add(tag);
+    const tagRef = await addDoc(collection(firebase.db, collections.TAG), tag);
     return {
       ...tag,
       id: tagRef.id,
     };
   },
   createSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
-    const snippetRef = await firebase.db
-      .collection(collections.SNIPPET)
-      .add(snippet);
+    const snippetRef = await addDoc(
+      collection(firebase.db, collections.SNIPPET),
+      snippet
+    );
     return {
       ...snippet,
       id: snippetRef.id,
@@ -37,17 +49,17 @@ const db = {
   },
   updateSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
     const { id, ...updateSnippet } = snippet;
-    await firebase.db
-      .collection(collections.SNIPPET)
-      .doc(id)
-      .update(updateSnippet);
+    const snippetRef = doc(firebase.db, collections.SNIPPET, id);
+    await updateDoc(snippetRef, updateSnippet);
     return snippet;
   },
   restoreOrDeleteSnippet: async (snippet: ISnippet): Promise<ISnippet> => {
     const { id, ...updateSnippet } = snippet;
+    const snippetRef = doc(firebase.db, collections.SNIPPET, id);
+
     if (snippet.deleted_at) {
-      await firebase.db.collection(collections.SNIPPET).doc(id).update({
-        deleted_at: app.firestore.FieldValue.delete(),
+      await updateDoc(snippetRef, {
+        deleted_at: deleteField(),
       });
       const { deleted_at, ...restoreSnippet } = updateSnippet;
       return {
@@ -59,10 +71,7 @@ const db = {
         ...updateSnippet,
         deleted_at: new Date().getTime(),
       };
-      await firebase.db
-        .collection(collections.SNIPPET)
-        .doc(id)
-        .update(deletedSnippet);
+      await updateDoc(snippetRef, deletedSnippet);
       return {
         ...deletedSnippet,
         id,
@@ -70,9 +79,9 @@ const db = {
     }
   },
   getFolders: async (): Promise<IFolder[]> => {
-    const folderSnapshot = await firebase.db
-      .collection(collections.FOLDER)
-      .get();
+    const folderSnapshot = await getDocs(
+      collection(firebase.db, collections.FOLDER)
+    );
     const folders: IFolder[] = [];
     folderSnapshot.forEach((doc) => {
       const data = doc.data();
@@ -84,7 +93,9 @@ const db = {
     return folders;
   },
   getTags: async (): Promise<ITag[]> => {
-    const tagSnapshot = await firebase.db.collection(collections.TAG).get();
+    const tagSnapshot = await getDocs(
+      collection(firebase.db, collections.TAG)
+    );
     const tags: ITag[] = [];
     tagSnapshot.forEach((doc) => {
       const data = doc.data();
@@ -96,9 +107,9 @@ const db = {
     return tags;
   },
   getSnippets: async (): Promise<ISnippet[]> => {
-    const snippetSnapshot = await firebase.db
-      .collection(collections.SNIPPET)
-      .get();
+    const snippetSnapshot = await getDocs(
+      collection(firebase.db, collections.SNIPPET)
+    );
     const snippets: ISnippet[] = [];
     snippetSnapshot.forEach((doc) => {
       const data = doc.data();
@@ -110,18 +121,20 @@ const db = {
     return snippets;
   },
   searchSnippets: async (searchTerms: ISearchTerm[]): Promise<ISnippet[]> => {
-    let snippetRef:
-      | app.firestore.CollectionReference
-      | app.firestore.Query = firebase.db.collection(collections.SNIPPET);
-    searchTerms.forEach((searchTerm) => {
-      snippetRef = snippetRef.where(
+    const constraints = searchTerms.map((searchTerm) =>
+      where(
         searchTerm.propertyName,
-        searchTerm.operator as app.firestore.WhereFilterOp,
+        searchTerm.operator as WhereFilterOp,
         searchTerm.value
-      );
-    });
+      )
+    );
 
-    var snippetSnapshot = await snippetRef.get();
+    const snippetQuery = query(
+      collection(firebase.db, collections.SNIPPET),
+      ...constraints
+    );
+
+    const snippetSnapshot = await getDocs(snippetQuery);
     const snippets: ISnippet[] = [];
     snippetSnapshot.forEach((doc) => {
       const data = doc.data();

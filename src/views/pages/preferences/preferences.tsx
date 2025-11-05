@@ -1,15 +1,16 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { signOut } from "firebase/auth";
 import assets from "../../../assets";
 import firebaseApp from "../../../data/firebase";
-import { snippetHome } from "../../../data/state/reducers";
+import { useNavigationStore } from "../../../data/state/navigationStore";
 import OutlineButton from "../../components/outline-button";
 import "./preferences.scss";
 
 const Preferences = () => {
-  const dispatch = useDispatch();
+  const snippetHome = useNavigationStore((state) => state.snippetHome);
+
   const logoutUser = async () => {
-    await firebaseApp.auth.signOut();
+    await signOut(firebaseApp.auth);
   };
 
   return (
@@ -18,7 +19,7 @@ const Preferences = () => {
         <OutlineButton
           title="BACK"
           onClick={() => {
-            dispatch(snippetHome());
+            snippetHome();
           }}
         />
         <h1>Preferences</h1>
