@@ -1,31 +1,28 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSnippetStore } from "../../../data/state/snippetStore";
 import { IDropdownItem, ISnippet, SimpleSnippet } from "../../../data/models";
 import OutlineDropdown from "../outline-dropdown";
 import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import { RootState, createOrUpdateSnippet } from "../../../data/state/reducers";
-import "./snippet-form.scss";
-import MonacoEditor from "react-monaco-editor";
 import OutlineButton from "../outline-button";
-import { useDispatch } from "react-redux";
 import { arrayToItems } from "../../../data/helpers";
+import Editor from "@monaco-editor/react";
+import "./snippet-form.scss";
 
 interface ISnippetFormProps {
-  closeForm: Function;
+  closeForm: () => void;
   snippet: ISnippet | null;
 }
 
 const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
-  const dispatch = useDispatch();
   const [eSnippet, setESnippet] = useState<ISnippet>(
     snippet ?? new SimpleSnippet()
   );
 
-  const { folders, tags, languages } = useSelector(
-    (state: RootState) => state.snippets
-  );
+  const folders = useSnippetStore((state) => state.folders);
+  const tags = useSnippetStore((state) => state.tags);
+  const languages = useSnippetStore((state) => state.languages);
+  const createOrUpdateSnippet = useSnippetStore((state) => state.createOrUpdateSnippet);
 
   const onSaveClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: Need proper validation
@@ -36,7 +33,7 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
     if (eSnippet.snippet.length < 3) {
       alert("Snippet must be longer than 3+");
     }
-    dispatch(createOrUpdateSnippet(eSnippet));
+    await createOrUpdateSnippet(eSnippet);
     closeForm();
   };
 
@@ -117,7 +114,7 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
       </div>
 
       <div className="snippet-editor">
-        <MonacoEditor
+        <Editor
           language={eSnippet.language ?? languages[0]}
           value={eSnippet.snippet}
           height="96%"
@@ -131,18 +128,13 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
           onChange={(newValue) =>
             setESnippet({
               ...eSnippet,
-              snippet: newValue,
+              snippet: newValue || "",
             })
           }
         />
       </div>
     </div>
   );
-};
-
-SnippetForm.propTypes = {
-  closeForm: PropTypes.func,
-  snippet: PropTypes.object,
 };
 
 export default SnippetForm;

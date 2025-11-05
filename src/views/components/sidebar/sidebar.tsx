@@ -1,48 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import OutlineButton from "../outline-button";
-import "./sidebar.scss";
 import { capitalize } from "lodash";
+import { useSnippetStore } from "../../../data/state/snippetStore";
+import { useNavigationStore } from "../../../data/state/navigationStore";
+import { IFolder, ISearchTerm, ITag } from "../../../data/models";
+import OutlineButton from "../outline-button";
 import Modal from "../modal";
 import Portal from "../../portal";
 import SimpleForm from "../simple-form";
 import OutlineItem from "../outline-item";
-import {
-  createFolder,
-  createTag,
-  getDeletedSnippets,
-  getFavouriteSnippets,
-  getFolders,
-  getSnippets,
-  getTags,
-  preferences,
-  RootState,
-  searchSnippets,
-  searchSnippetsByTag,
-} from "../../../data/state/reducers";
-import { IFolder, ISearchTerm, ITag } from "../../../data/models";
+import "./sidebar.scss";
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
   const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(
     false
   );
   const [showCreateTagModal, setShowCreateTagModal] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<string>();
 
-  const { folders, tags, languages } = useSelector(
-    (state: RootState) => state.snippets
-  );
+  const folders = useSnippetStore((state) => state.folders);
+  const tags = useSnippetStore((state) => state.tags);
+  const languages = useSnippetStore((state) => state.languages);
+  const getFolders = useSnippetStore((state) => state.getFolders);
+  const getTags = useSnippetStore((state) => state.getTags);
+  const getSnippets = useSnippetStore((state) => state.getSnippets);
+  const getFavouriteSnippets = useSnippetStore((state) => state.getFavouriteSnippets);
+  const getDeletedSnippets = useSnippetStore((state) => state.getDeletedSnippets);
+  const searchSnippets = useSnippetStore((state) => state.searchSnippets);
+  const searchSnippetsByTag = useSnippetStore((state) => state.searchSnippetsByTag);
+  const createFolder = useSnippetStore((state) => state.createFolder);
+  const createTag = useSnippetStore((state) => state.createTag);
+  const preferences = useNavigationStore((state) => state.preferences);
 
   useEffect(() => {
     const loadSidebarData = () => {
       setSelectedItem("all");
-      dispatch(getFolders());
-      dispatch(getTags());
+      getFolders();
+      getTags();
     };
     loadSidebarData();
     return () => {};
-  }, [dispatch]);
+  }, [getFolders, getTags]);
 
   return (
     <div className="sidebar">
@@ -54,7 +51,7 @@ const Sidebar = () => {
             selected={selectedItem === "all"}
             onItemClick={() => {
               setSelectedItem("all");
-              dispatch(getSnippets());
+              getSnippets();
             }}
           />
           <OutlineItem
@@ -62,7 +59,7 @@ const Sidebar = () => {
             selected={selectedItem === "favourite"}
             onItemClick={() => {
               setSelectedItem("favourite");
-              dispatch(getFavouriteSnippets());
+              getFavouriteSnippets();
             }}
           />
           <OutlineItem
@@ -70,7 +67,7 @@ const Sidebar = () => {
             selected={selectedItem === "trash"}
             onItemClick={() => {
               setSelectedItem("trash");
-              dispatch(getDeletedSnippets());
+              getDeletedSnippets();
             }}
           />
         </div>
@@ -93,13 +90,11 @@ const Sidebar = () => {
               selected={selectedItem === folder.id}
               onItemClick={() => {
                 setSelectedItem(folder.id);
-                dispatch(
-                  searchSnippets({
-                    propertyName: "folder",
-                    operator: "==",
-                    value: folder.id,
-                  } as ISearchTerm)
-                );
+                searchSnippets({
+                  propertyName: "folder",
+                  operator: "==",
+                  value: folder.id,
+                } as ISearchTerm);
               }}
             />
           ))}
@@ -124,7 +119,7 @@ const Sidebar = () => {
               wrapped
               onItemClick={() => {
                 setSelectedItem(tag.id);
-                dispatch(searchSnippetsByTag(tag.id));
+                searchSnippetsByTag(tag.id);
               }}
             />
           ))}
@@ -140,13 +135,11 @@ const Sidebar = () => {
               selected={selectedItem === lang}
               onItemClick={() => {
                 setSelectedItem(lang);
-                dispatch(
-                  searchSnippets({
-                    propertyName: "language",
-                    operator: "==",
-                    value: lang,
-                  } as ISearchTerm)
-                );
+                searchSnippets({
+                  propertyName: "language",
+                  operator: "==",
+                  value: lang,
+                } as ISearchTerm);
               }}
               wrapped
             />
@@ -158,7 +151,7 @@ const Sidebar = () => {
         <OutlineButton
           title="Preferences"
           onClick={() => {
-            dispatch(preferences());
+            preferences();
           }}
         />
       </div>
@@ -169,11 +162,9 @@ const Sidebar = () => {
             <SimpleForm
               placeholder="Folder Name"
               onSave={(fieldValue: string) => {
-                dispatch(
-                  createFolder({
-                    name: fieldValue,
-                  } as IFolder)
-                );
+                createFolder({
+                  name: fieldValue,
+                } as IFolder);
                 setShowCreateFolderModal(false);
               }}
               onCancel={() => setShowCreateFolderModal(false)}
@@ -188,11 +179,9 @@ const Sidebar = () => {
             <SimpleForm
               placeholder="Tag Name"
               onSave={(fieldValue: string) => {
-                dispatch(
-                  createTag({
-                    name: fieldValue,
-                  } as ITag)
-                );
+                createTag({
+                  name: fieldValue,
+                } as ITag);
                 setShowCreateTagModal(false);
               }}
               onCancel={() => setShowCreateTagModal(false)}

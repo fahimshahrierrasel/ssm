@@ -1,27 +1,25 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import PropTypes from "prop-types";
+import { useState } from "react";
+import { useSnippetStore } from "../../../data/state/snippetStore";
 import "./snippet-details.scss";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  createOrUpdateSnippet,
-  deleteOrRestoreSnippet,
-  RootState,
-} from "../../../data/state/reducers";
-import { useSelector } from "react-redux";
+import { Prism as SyntaxHighlighterBase } from "react-syntax-highlighter";
 import OutlineButton from "../outline-button";
 import assets from "../../../assets";
 import SimpleAlert from "../simple-alert";
 
+// Type-safe wrapper for SyntaxHighlighter
+const SyntaxHighlighter = SyntaxHighlighterBase as any;
+
 interface ISnippetDetailsProps {
-  openForm: Function;
+  openForm: () => void;
 }
 
 const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
-  const dispatch = useDispatch();
-  const { selectedSnippet, folders, tags } = useSelector(
-    (state: RootState) => state.snippets
-  );
+  const selectedSnippet = useSnippetStore((state) => state.selectedSnippet);
+  const folders = useSnippetStore((state) => state.folders);
+  const tags = useSnippetStore((state) => state.tags);
+  const createOrUpdateSnippet = useSnippetStore((state) => state.createOrUpdateSnippet);
+  const deleteOrRestoreSnippet = useSnippetStore((state) => state.deleteOrRestoreSnippet);
+
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showRestoreModal, setShowRestoreModal] = useState<boolean>(false);
 
@@ -39,12 +37,10 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
             }
             alt="is_favourite"
             onClick={() => {
-              dispatch(
-                createOrUpdateSnippet({
-                  ...selectedSnippet,
-                  is_favourite: !selectedSnippet.is_favourite,
-                })
-              );
+              createOrUpdateSnippet({
+                ...selectedSnippet,
+                is_favourite: !selectedSnippet.is_favourite,
+              });
             }}
           />
           <span>{selectedSnippet.name}</span>
@@ -106,16 +102,16 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
         <SyntaxHighlighter
           showLineNumbers={true}
           wrapLongLines={true}
-          language={selectedSnippet.language}>
-          {selectedSnippet.snippet}
-        </SyntaxHighlighter>
+          language={selectedSnippet.language}
+          children={selectedSnippet.snippet}
+        />
       </div>
 
       {showDeleteModal && (
         <SimpleAlert
           description={`Do you want to delete ${selectedSnippet.name}?`}
           acceptAction={async () => {
-            dispatch(deleteOrRestoreSnippet(selectedSnippet));
+            await deleteOrRestoreSnippet(selectedSnippet);
             setShowDeleteModal(false);
           }}
           cancelAction={() => {
@@ -128,7 +124,7 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
         <SimpleAlert
           description={`Do you want to restore ${selectedSnippet.name}?`}
           acceptAction={async () => {
-            dispatch(deleteOrRestoreSnippet(selectedSnippet));
+            await deleteOrRestoreSnippet(selectedSnippet);
             setShowRestoreModal(false);
           }}
           cancelAction={() => {
@@ -149,10 +145,6 @@ const EmptySnippet = () => {
       </div>
     </div>
   );
-};
-
-SnippetDetails.propTypes = {
-  openForm: PropTypes.func,
 };
 
 export default SnippetDetails;

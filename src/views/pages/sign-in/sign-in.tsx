@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import firebaseApp from "../../../data/firebase";
 import Loader from "../../components/loader";
 import OutlineButton from "../../components/outline-button";
@@ -19,7 +20,7 @@ const SignIn = () => {
     }
     setWaiting(true);
     try {
-      await firebaseApp.auth.signInWithEmailAndPassword(email, password);
+      await signInWithEmailAndPassword(firebaseApp.auth, email, password);
       if (!isMounted.current) {
         setWaiting(false);
       }

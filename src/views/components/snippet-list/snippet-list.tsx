@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import PropTypes from "prop-types";
+import { useSnippetStore } from "../../../data/state/snippetStore";
 import OutlineButton from "../outline-button";
 import OutlineInput from "../outline-input";
 import Snippet from "../snippet/snippet";
 import "./snippet-list.scss";
-import {
-  setSelectedSnippet,
-  RootState,
-  getSnippets,
-} from "../../../data/state/reducers";
 
 interface ISnippetListProps {
-  openForm: Function;
+  openForm: () => void;
 }
 
 const SnippetList = ({ openForm }: ISnippetListProps) => {
-  const dispatch = useDispatch();
-  const { snippets } = useSelector((state: RootState) => state.snippets);
+  const snippets = useSnippetStore((state) => state.snippets);
+  const getSnippets = useSnippetStore((state) => state.getSnippets);
+  const setSelectedSnippet = useSnippetStore((state) => state.setSelectedSnippet);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    dispatch(getSnippets());
+    getSnippets();
     return () => {};
-  }, [dispatch]);
+  }, [getSnippets]);
 
   return (
     <div className="snippet-list">
@@ -59,17 +54,13 @@ const SnippetList = ({ openForm }: ISnippetListProps) => {
               key={snippet.id}
               snippet={snippet}
               onClick={() => {
-                dispatch(setSelectedSnippet(snippet.id));
+                setSelectedSnippet(snippet.id);
               }}
             />
           ))}
       </div>
     </div>
   );
-};
-
-SnippetList.propTypes = {
-  openForm: PropTypes.func,
 };
 
 export default SnippetList;

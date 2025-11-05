@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../data/state/reducers";
+import { useSnippetStore } from "../../../data/state/snippetStore";
 import Sidebar from "../../components/sidebar";
 import SnippetDetails from "../../components/snippet-details";
 import SnippetForm from "../../components/snippet-form";
@@ -15,8 +14,7 @@ enum FormState {
 
 const SnippetApp = () => {
   const [formState, setFormState] = useState<FormState>(FormState.None);
-
-  const { selectedSnippet } = useSelector((state: RootState) => state.snippets);
+  const selectedSnippet = useSnippetStore((state) => state.selectedSnippet);
 
   return (
     <div className="snippet-app">
