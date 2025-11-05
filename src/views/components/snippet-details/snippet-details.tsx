@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
-import "./snippet-details.scss";
 import { Prism as SyntaxHighlighterBase } from "react-syntax-highlighter";
 import OutlineButton from "../outline-button";
 import assets from "../../../assets";

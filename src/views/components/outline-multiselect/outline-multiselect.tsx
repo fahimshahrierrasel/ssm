@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { IDropdownItem } from "../../../data/models";
-import "./outline-multiselect.scss";
 import { MdClose } from "react-icons/md";
 
 interface IOutlineMultiselectProps {

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import Sidebar from "../../components/sidebar";
 import SnippetDetails from "../../components/snippet-details";
 import SnippetForm from "../../components/snippet-form";
 import SnippetList from "../../components/snippet-list";
-import "./snippet-app.scss";
 
 enum FormState {
   New,
@@ -17,7 +16,7 @@ const SnippetApp = () => {
   const selectedSnippet = useSnippetStore((state) => state.selectedSnippet);
 
   return (
-    <div className="snippet-app">
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
       <Sidebar />
       <SnippetList openForm={() => setFormState(FormState.New)} />
       {formState !== FormState.None ? (

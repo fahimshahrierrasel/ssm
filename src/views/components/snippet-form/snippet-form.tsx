@@ -7,7 +7,6 @@ import OutlineMultiselect from "../outline-multiselect";
 import OutlineButton from "../outline-button";
 import { arrayToItems } from "../../../data/helpers";
 import Editor from "@monaco-editor/react";
-import "./snippet-form.scss";
 
 interface ISnippetFormProps {
   closeForm: () => void;

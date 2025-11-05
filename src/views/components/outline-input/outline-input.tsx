@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import "./outline-input.scss";
 
 interface IOutlineInputProps {
   placeholder: string;

@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import "./snippet.scss";
 import { ISnippet } from "../../../data/models";
 import assets from "../../../assets";
 

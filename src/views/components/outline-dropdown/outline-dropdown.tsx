@@ -1,5 +1,4 @@
 import React from "react";
-import "./outline-dropdown.scss";
 import PropTypes from "prop-types";
 import { capitalize } from "lodash";
 import { IDropdownItem } from "../../../data/models";

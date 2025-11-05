@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Portal from "../../portal";
 import Modal from "../modal";
-import "./simple-alert.scss";
 import OutlineButton from "../outline-button";
 
 interface ISimpleAlertProps {
