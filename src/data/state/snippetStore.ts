@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { IFolder, ISearchTerm, ISnippet, ITag, SimpleSnippet } from '../models';
 import { languages } from '../constants';
 import { orderBy } from 'lodash';
-import db from '../db';
+import pbDb from '../pbDb';
 import { notDeletedFilter } from '../helpers';
 
 interface SnippetStore {
@@ -90,7 +90,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
       let snippet = new SimpleSnippet();
 
       if (newSnippet.id !== '') {
-        snippet = await db.updateSnippet({
+        snippet = await pbDb.updateSnippet({
           ...newSnippet,
           updated_at: new Date().getTime(),
         } as ISnippet);
@@ -98,7 +98,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
         get().setSelectedSnippet(snippet.id);
       } else {
         let { id, deleted_at, ...simpleSnippet } = newSnippet;
-        snippet = await db.createSnippet({
+        snippet = await pbDb.createSnippet({
           ...simpleSnippet,
           is_favourite: false,
           created_at: new Date().getTime(),
@@ -114,7 +114,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
   deleteOrRestoreSnippet: async (selectedSnippet) => {
     try {
       console.log('Got Delete Command');
-      const snippet = await db.restoreOrDeleteSnippet(selectedSnippet);
+      const snippet = await pbDb.restoreOrDeleteSnippet(selectedSnippet);
       get().updateSnippet(snippet);
       get().setSelectedSnippet('');
 
@@ -130,7 +130,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   createFolder: async (newFolder) => {
     try {
-      const folder = await db.createFolder({
+      const folder = await pbDb.createFolder({
         ...newFolder,
         created_at: new Date().getTime(),
         updated_at: new Date().getTime(),
@@ -143,7 +143,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   getFolders: async () => {
     try {
-      const folders = await db.getFolders();
+      const folders = await pbDb.getFolders();
       get().addFolders(folders);
     } catch (err) {
       console.error('Error at fetching folders', err);
@@ -152,7 +152,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   createTag: async (newTag) => {
     try {
-      const tag = await db.createTag({
+      const tag = await pbDb.createTag({
         ...newTag,
         created_at: new Date().getTime(),
         updated_at: new Date().getTime(),
@@ -165,7 +165,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   getTags: async () => {
     try {
-      const tags = await db.getTags();
+      const tags = await pbDb.getTags();
       get().addTags(tags);
     } catch (err) {
       console.error('Error at fetching tags', err);
@@ -174,7 +174,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   getSnippets: async () => {
     try {
-      let snippets = await db.getSnippets();
+      let snippets = await pbDb.getSnippets();
       snippets = snippets.filter(notDeletedFilter);
       get().addSnippets(snippets);
     } catch (err) {
@@ -189,7 +189,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
         operator: '==',
         value: true,
       };
-      let snippets = await db.searchSnippets([searchTerm]);
+      let snippets = await pbDb.searchSnippets([searchTerm]);
       snippets = snippets.filter(notDeletedFilter);
       get().addSnippets(snippets);
     } catch (err) {
@@ -204,7 +204,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
         operator: '!=',
         value: null,
       };
-      const snippets = await db.searchSnippets([searchTerm]);
+      const snippets = await pbDb.searchSnippets([searchTerm]);
       get().addSnippets(snippets);
     } catch (err) {
       console.error('Error at searching snippets', err);
@@ -213,7 +213,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
 
   searchSnippets: async (searchTerm) => {
     try {
-      let snippets = await db.searchSnippets([searchTerm]);
+      let snippets = await pbDb.searchSnippets([searchTerm]);
       snippets = snippets.filter(notDeletedFilter);
       get().addSnippets(snippets);
     } catch (err) {
@@ -228,7 +228,7 @@ export const useSnippetStore = create<SnippetStore>((set, get) => ({
         operator: 'array-contains',
         value: tagId,
       };
-      let snippets = await db.searchSnippets([searchTerm]);
+      let snippets = await pbDb.searchSnippets([searchTerm]);
       snippets = snippets.filter(notDeletedFilter);
       get().addSnippets(snippets);
     } catch (err) {

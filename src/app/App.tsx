@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { User, onAuthStateChanged } from "firebase/auth";
 import { navigationsPath } from "../data/constants";
-import firebaseApp from "../data/firebase";
+import pb from "../data/pocketbase";
 import { useNavigationStore } from "../data/state/navigationStore";
 import Loader from "../views/components/loader";
 import Preferences from "../views/pages/preferences";
@@ -10,24 +9,24 @@ import SnippetApp from "../views/pages/snippet-app";
 
 function App() {
   const location = useNavigationStore((state) => state.location);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [waiting, setWaiting] = useState<boolean>(false);
 
   useEffect(() => {
     setWaiting(true);
-    const unsubscribe = onAuthStateChanged(
-      firebaseApp.auth,
-      (user) => {
-        setUser(user);
-        setWaiting(false);
-      },
-      (error) => {
-        setWaiting(false);
-        console.error(error);
-      }
-    );
 
-    return () => unsubscribe();
+    // Check initial auth state
+    setUser(pb.authStore.model);
+    setWaiting(false);
+
+    // Subscribe to auth state changes
+    const unsubscribe = pb.authStore.onChange((token, model) => {
+      setUser(model);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const getPage = () => {
