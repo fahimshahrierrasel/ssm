@@ -1,7 +1,6 @@
 import React from "react";
-import { signOut } from "firebase/auth";
 import assets from "../../../assets";
-import firebaseApp from "../../../data/firebase";
+import pb from "../../../data/pocketbase";
 import { useNavigationStore } from "../../../data/state/navigationStore";
 import OutlineButton from "../../components/outline-button";
 
@@ -9,7 +8,7 @@ const Preferences = () => {
   const snippetHome = useNavigationStore((state) => state.snippetHome);
 
   const logoutUser = async () => {
-    await signOut(firebaseApp.auth);
+    pb.authStore.clear();
   };
 
   return (
@@ -28,11 +27,11 @@ const Preferences = () => {
           <h2>Account</h2>
           <p>
             <span>Name: </span>
-            <span>{firebaseApp.auth.currentUser?.displayName}</span>
+            <span>{pb.authStore.model?.name || pb.authStore.model?.username}</span>
           </p>
           <p>
             <span>Email: </span>
-            <span>{firebaseApp.auth.currentUser?.email}</span>
+            <span>{pb.authStore.model?.email}</span>
           </p>
           <br />
           <OutlineButton title="LOG OUT" onClick={logoutUser} />

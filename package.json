@@ -15,6 +15,7 @@
     "firebase": "^10.14.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
+    "pocketbase": "^0.26.3",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -46,7 +47,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "migrate": "npx tsx scripts/migrate-to-pocketbase.ts",
+    "migrate:export": "npx tsx scripts/migrate-to-pocketbase.ts --export-only",
+    "migrate:import": "npx tsx scripts/migrate-to-pocketbase.ts --import-only"
   },
   "eslintConfig": {
     "extends": [

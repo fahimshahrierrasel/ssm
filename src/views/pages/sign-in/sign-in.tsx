@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { Code2, Lock, Mail } from "lucide-react";
-import firebaseApp from "../../../data/firebase";
+import pb from "../../../data/pocketbase";
 import Loader from "../../components/loader";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -26,7 +25,7 @@ const SignIn = () => {
 
     setWaiting(true);
     try {
-      await signInWithEmailAndPassword(firebaseApp.auth, email, password);
+      await pb.collection('users').authWithPassword(email, password);
       if (!isMounted.current) {
         setWaiting(false);
       }
