@@ -25,9 +25,9 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
   return !selectedSnippet ? (
     <EmptySnippet />
   ) : (
-    <div className="snippet-details">
-      <div className="info">
-        <div className="title">
+    <div className="h-screen grid grid-rows-[auto_1fr] flex-1">
+      <div className="grid p-2.5 grid-rows-[auto_auto_auto_auto]">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5">
           <img
             src={
               selectedSnippet.is_favourite
@@ -35,6 +35,7 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
                 : assets.YET_FAVOURITE
             }
             alt="is_favourite"
+            className="h-5 w-5 hover:scale-110 hover:transition-all hover:duration-200 cursor-pointer"
             onClick={() => {
               createOrUpdateSnippet({
                 ...selectedSnippet,
@@ -42,8 +43,8 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
               });
             }}
           />
-          <span>{selectedSnippet.name}</span>
-          <div className="action-buttons">
+          <span className="text-xl font-bold">{selectedSnippet.name}</span>
+          <div className="grid grid-cols-2 gap-1.5">
             {selectedSnippet.deleted_at ? (
               <OutlineButton
                 style={{
@@ -81,7 +82,7 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
         </div>
         <span className="language">{selectedSnippet.language}</span>
         <div className="folder">
-          <span>Folder:</span>
+          <span className="pr-1.5">Folder:</span>
           <span>
             {
               folders.find((folder) => folder.id === selectedSnippet.folder)
@@ -91,13 +92,13 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
         </div>
 
         <div className="tags">
-          <span>Tags:</span>
+          <span className="pr-1.5">Tags:</span>
           {selectedSnippet.tags
             ?.map((sTag) => tags.find((tag) => tag.id === sTag)?.name)
             .join(", ")}
         </div>
       </div>
-      <div className="editor">
+      <div className="overflow-y-auto">
         <SyntaxHighlighter
           showLineNumbers={true}
           wrapLongLines={true}
@@ -137,8 +138,8 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
 
 const EmptySnippet = () => {
   return (
-    <div className="empty-snippet">
-      <div className="message">
+    <div className="relative flex-1">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2.5 border border-border text-center hover:bg-foreground hover:text-background hover:cursor-help transition-colors">
         <p>No Snippet Selected!</p>
         <p>Select Snippet from snippet list</p>
       </div>

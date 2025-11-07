@@ -37,9 +37,9 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
   };
 
   return (
-    <div className="snippet-form">
-      <div className="meta-info">
-        <div className="name">
+    <div className="h-screen grid grid-rows-[auto_1fr] flex-1">
+      <div className="grid items-center p-1.5 gap-1.5 grid-cols-2 [grid-template-areas:'name_name''folder_language''tags_tags']">
+        <div className="[grid-area:name] grid grid-cols-[1fr_auto_auto] gap-1.5">
           <OutlineInput
             placeholder="Snippet Name"
             value={eSnippet.name}
@@ -59,8 +59,8 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
           />
         </div>
 
-        <div className="folder">
-          <label>Folder</label>
+        <div className="[grid-area:folder]">
+          <label className="block mb-1">Folder</label>
           <OutlineDropdown
             items={arrayToItems(folders)}
             selected={
@@ -77,8 +77,8 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
           />
         </div>
 
-        <div className="language">
-          <label>Language</label>
+        <div className="[grid-area:language]">
+          <label className="block mb-1">Language</label>
           <OutlineDropdown
             items={arrayToItems(languages)}
             selected={
@@ -95,8 +95,8 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
           />
         </div>
 
-        <div className="tags">
-          <label>Tags</label>
+        <div className="[grid-area:tags]">
+          <label className="block mb-1">Tags</label>
           <OutlineMultiselect
             items={arrayToItems(tags)}
             selectedItems={arrayToItems(tags).filter((item) =>
@@ -112,11 +112,11 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
         </div>
       </div>
 
-      <div className="snippet-editor">
+      <div className="row-start-2">
         <Editor
           language={eSnippet.language ?? languages[0]}
           value={eSnippet.snippet}
-          height="96%"
+          height="100%"
           options={{
             formatOnType: true,
             formatOnPaste: true,
