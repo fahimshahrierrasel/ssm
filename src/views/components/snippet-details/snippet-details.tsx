@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import { Prism as SyntaxHighlighterBase } from "react-syntax-highlighter";
-import OutlineButton from "../outline-button";
-import assets from "../../../assets";
 import SimpleAlert from "../simple-alert";
+import { Button } from "../../../components/ui/button";
+import { Badge } from "../../../components/ui/badge";
+import { Heart, Pencil, Trash2, RotateCcw } from "lucide-react";
 
 // Type-safe wrapper for SyntaxHighlighter
 const SyntaxHighlighter = SyntaxHighlighterBase as any;
@@ -26,78 +27,98 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
     <EmptySnippet />
   ) : (
     <div className="h-screen grid grid-rows-[auto_1fr] flex-1">
-      <div className="grid p-2.5 grid-rows-[auto_auto_auto_auto]">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5">
-          <img
-            src={
-              selectedSnippet.is_favourite
-                ? assets.FAVOURITE
-                : assets.YET_FAVOURITE
-            }
-            alt="is_favourite"
-            className="h-5 w-5 hover:scale-110 hover:transition-all hover:duration-200 cursor-pointer"
-            onClick={() => {
-              createOrUpdateSnippet({
-                ...selectedSnippet,
-                is_favourite: !selectedSnippet.is_favourite,
-              });
-            }}
-          />
-          <span className="text-xl font-bold">{selectedSnippet.name}</span>
-          <div className="grid grid-cols-2 gap-1.5">
-            {selectedSnippet.deleted_at ? (
-              <OutlineButton
-                style={{
-                  height: "25px",
-                  color: "red",
-                  border: "1px solid red",
-                }}
-                title="Restore"
+      <div className="border-b bg-card">
+        <div className="p-4 space-y-4">
+          {/* Title and Actions */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={selectedSnippet.is_favourite ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-foreground"}
                 onClick={() => {
-                  setShowRestoreModal(true);
+                  createOrUpdateSnippet({
+                    ...selectedSnippet,
+                    is_favourite: !selectedSnippet.is_favourite,
+                  });
                 }}
-              />
-            ) : (
-              <OutlineButton
-                style={{
-                  height: "25px",
-                  color: "red",
-                  border: "1px solid red",
-                }}
-                title="Remove"
-                onClick={() => {
-                  setShowDeleteModal(true);
-                }}
-              />
-            )}
+              >
+                <Heart className={selectedSnippet.is_favourite ? "fill-current" : ""} />
+              </Button>
+              <h2 className="text-xl font-bold truncate">{selectedSnippet.name}</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {selectedSnippet.deleted_at ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowRestoreModal(true);
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Restore
+                </Button>
+              ) : (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove
+                </Button>
+              )}
 
-            <OutlineButton
-              style={{ height: "25px" }}
-              title="Edit"
-              onClick={() => {
-                openForm();
-              }}
-            />
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  openForm();
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            </div>
+          </div>
+
+          {/* Metadata */}
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Language:</span>
+              <Badge variant="secondary">{selectedSnippet.language}</Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Folder:</span>
+              <Badge variant="outline">
+                {
+                  folders.find((folder) => folder.id === selectedSnippet.folder)
+                    ?.name
+                }
+              </Badge>
+            </div>
+            {selectedSnippet.tags && selectedSnippet.tags.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Tags:</span>
+                <div className="flex flex-wrap gap-1">
+                  {selectedSnippet.tags.map((sTag) => {
+                    const tag = tags.find((tag) => tag.id === sTag);
+                    return tag ? (
+                      <Badge key={sTag} variant="outline" className="text-xs">
+                        {tag.name}
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <span className="language">{selectedSnippet.language}</span>
-        <div className="folder">
-          <span className="pr-1.5">Folder:</span>
-          <span>
-            {
-              folders.find((folder) => folder.id === selectedSnippet.folder)
-                ?.name
-            }
-          </span>
-        </div>
-
-        <div className="tags">
-          <span className="pr-1.5">Tags:</span>
-          {selectedSnippet.tags
-            ?.map((sTag) => tags.find((tag) => tag.id === sTag)?.name)
-            .join(", ")}
-        </div>
       </div>
+
       <div className="overflow-y-auto">
         <SyntaxHighlighter
           showLineNumbers={true}

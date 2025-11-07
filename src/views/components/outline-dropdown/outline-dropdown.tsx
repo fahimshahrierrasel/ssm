@@ -7,14 +7,14 @@ interface IOutlineDropdownProps {
   items: IDropdownItem[];
   selected: IDropdownItem | null;
   onChange: Function;
-  style: object;
+  style?: object;
 }
 
 const OutlineDropdown = ({
   items,
   selected,
   onChange,
-  style,
+  style = {},
 }: IOutlineDropdownProps) => {
   return (
     <select
@@ -42,10 +42,6 @@ OutlineDropdown.propTypes = {
   selected: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   style: PropTypes.object,
-};
-
-OutlineDropdown.defaultProps = {
-  style: {},
 };
 
 export default OutlineDropdown;

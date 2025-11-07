@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import { IDropdownItem, ISnippet, SimpleSnippet } from "../../../data/models";
-import OutlineDropdown from "../outline-dropdown";
-import OutlineInput from "../outline-input";
 import OutlineMultiselect from "../outline-multiselect";
-import OutlineButton from "../outline-button";
 import { arrayToItems } from "../../../data/helpers";
 import Editor from "@monaco-editor/react";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import { capitalize } from "lodash";
 
 interface ISnippetFormProps {
   closeForm: () => void;
@@ -38,65 +46,79 @@ const SnippetForm = ({ closeForm, snippet }: ISnippetFormProps) => {
 
   return (
     <div className="h-screen grid grid-rows-[auto_1fr] flex-1">
-      <div className="grid items-center p-1.5 gap-1.5 grid-cols-2 [grid-template-areas:'name_name''folder_language''tags_tags']">
-        <div className="[grid-area:name] grid grid-cols-[1fr_auto_auto] gap-1.5">
-          <OutlineInput
+      <div className="grid items-center p-4 gap-4 grid-cols-2 [grid-template-areas:'name_name''folder_language''tags_tags']">
+        <div className="[grid-area:name] grid grid-cols-[1fr_auto_auto] gap-2">
+          <Input
             placeholder="Snippet Name"
             value={eSnippet.name}
-            onChange={(newVal: string) =>
+            onChange={(e) =>
               setESnippet({
                 ...eSnippet,
-                name: newVal,
+                name: e.target.value,
               })
             }
           />
-          <OutlineButton title="SAVE" onClick={onSaveClick} />
-          <OutlineButton
-            title="CANCEL"
+          <Button onClick={onSaveClick}>SAVE</Button>
+          <Button
+            variant="outline"
             onClick={() => {
               closeForm();
             }}
-          />
+          >
+            CANCEL
+          </Button>
         </div>
 
-        <div className="[grid-area:folder]">
-          <label className="block mb-1">Folder</label>
-          <OutlineDropdown
-            items={arrayToItems(folders)}
-            selected={
-              arrayToItems(folders).find(
-                (item) => item.key === eSnippet.folder
-              ) ?? null
-            }
-            onChange={(newVal: IDropdownItem) => {
+        <div className="[grid-area:folder] space-y-2">
+          <Label>Folder</Label>
+          <Select
+            value={eSnippet.folder ?? undefined}
+            onValueChange={(value) => {
               setESnippet({
                 ...eSnippet,
-                folder: newVal.key,
+                folder: value,
               });
             }}
-          />
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select folder" />
+            </SelectTrigger>
+            <SelectContent>
+              {arrayToItems(folders).map((item) => (
+                <SelectItem key={item.key} value={item.key}>
+                  {capitalize(item.value)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="[grid-area:language]">
-          <label className="block mb-1">Language</label>
-          <OutlineDropdown
-            items={arrayToItems(languages)}
-            selected={
-              arrayToItems(languages).find(
-                (item) => item.key === eSnippet.language
-              ) ?? arrayToItems(languages)[0]
-            }
-            onChange={(newVal: IDropdownItem) => {
+        <div className="[grid-area:language] space-y-2">
+          <Label>Language</Label>
+          <Select
+            value={eSnippet.language ?? languages[0]}
+            onValueChange={(value) => {
               setESnippet({
                 ...eSnippet,
-                language: newVal.key,
+                language: value,
               });
             }}
-          />
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select language" />
+            </SelectTrigger>
+            <SelectContent>
+              {arrayToItems(languages).map((item) => (
+                <SelectItem key={item.key} value={item.key}>
+                  {capitalize(item.value)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="[grid-area:tags]">
-          <label className="block mb-1">Tags</label>
+        <div className="[grid-area:tags] space-y-2">
+          <Label>Tags</Label>
           <OutlineMultiselect
             items={arrayToItems(tags)}
             selectedItems={arrayToItems(tags).filter((item) =>
