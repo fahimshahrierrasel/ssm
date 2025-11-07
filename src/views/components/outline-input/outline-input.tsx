@@ -5,16 +5,16 @@ interface IOutlineInputProps {
   placeholder: string;
   value: any;
   onChange: Function;
-  style: object | null;
-  isPassword: boolean;
+  style?: object;
+  isPassword?: boolean;
 }
 
 const OutlineInput = ({
   placeholder,
   value,
   onChange,
-  style,
-  isPassword,
+  style = {},
+  isPassword = false,
 }: IOutlineInputProps) => {
   return (
     <input
@@ -34,11 +34,6 @@ OutlineInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   style: PropTypes.object,
   isPassword: PropTypes.bool,
-};
-
-OutlineInput.defaultProps = {
-  style: {},
-  isPassword: false,
 };
 
 export default OutlineInput;

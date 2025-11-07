@@ -4,10 +4,10 @@ import PropTypes from "prop-types";
 interface IOutlineButtonProps {
   title: string;
   onClick: Function;
-  style: object | null;
+  style?: object;
 }
 
-const OutlineButton = ({ title, onClick, style }: IOutlineButtonProps) => {
+const OutlineButton = ({ title, onClick, style = {} }: IOutlineButtonProps) => {
   return (
     <button
       className="outline-button"
@@ -22,10 +22,6 @@ OutlineButton.propTypes = {
   title: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   style: PropTypes.object,
-};
-
-OutlineButton.defaultProps = {
-  style: {},
 };
 
 export default OutlineButton;
