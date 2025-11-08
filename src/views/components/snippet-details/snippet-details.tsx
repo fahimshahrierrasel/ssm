@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import { Prism as SyntaxHighlighterBase } from "react-syntax-highlighter";
-import SimpleAlert from "../simple-alert";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Heart, Pencil, Trash2, RotateCcw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../components/ui/alert-dialog";
 
 // Type-safe wrapper for SyntaxHighlighter
 const SyntaxHighlighter = SyntaxHighlighterBase as any;
@@ -128,31 +137,49 @@ const SnippetDetails = ({ openForm }: ISnippetDetailsProps) => {
         />
       </div>
 
-      {showDeleteModal && (
-        <SimpleAlert
-          description={`Do you want to delete ${selectedSnippet.name}?`}
-          acceptAction={async () => {
-            await deleteOrRestoreSnippet(selectedSnippet);
-            setShowDeleteModal(false);
-          }}
-          cancelAction={() => {
-            setShowDeleteModal(false);
-          }}
-        />
-      )}
+      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Snippet</AlertDialogTitle>
+            <AlertDialogDescription>
+              Do you want to delete "{selectedSnippet.name}"? This will move it to trash.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await deleteOrRestoreSnippet(selectedSnippet);
+                setShowDeleteModal(false);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {showRestoreModal && (
-        <SimpleAlert
-          description={`Do you want to restore ${selectedSnippet.name}?`}
-          acceptAction={async () => {
-            await deleteOrRestoreSnippet(selectedSnippet);
-            setShowRestoreModal(false);
-          }}
-          cancelAction={() => {
-            setShowRestoreModal(false);
-          }}
-        />
-      )}
+      <AlertDialog open={showRestoreModal} onOpenChange={setShowRestoreModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restore Snippet</AlertDialogTitle>
+            <AlertDialogDescription>
+              Do you want to restore "{selectedSnippet.name}"? This will remove it from trash.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await deleteOrRestoreSnippet(selectedSnippet);
+                setShowRestoreModal(false);
+              }}
+            >
+              Restore
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
