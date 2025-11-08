@@ -21,7 +21,7 @@ class Firebase {
     this.db = getFirestore(app);
     this.auth = getAuth(app);
 
-    if (window.location.hostname === "localhost") {
+    if (window.location.hostname === "localhost" && import.meta.env.VITE_USE_EMULATOR === "true") {
       connectFirestoreEmulator(this.db, "localhost", 30101);
       connectAuthEmulator(this.auth, "http://localhost:30100/");
     }
