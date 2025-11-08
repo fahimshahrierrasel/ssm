@@ -6,11 +6,21 @@ import { useNavigationStore } from "../../../data/state/navigationStore";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
-import { ArrowLeft, LogOut, User, Mail, Code2, Info } from "lucide-react";
+import { ArrowLeft, LogOut, User, Mail, Code2, Info, Palette } from "lucide-react";
 import { Badge } from "../../../components/ui/badge";
+import { useTheme } from "../../../components/theme-provider";
+import { Label } from "../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 const Preferences = () => {
   const snippetHome = useNavigationStore((state) => state.snippetHome);
+  const { theme, setTheme } = useTheme();
 
   const logoutUser = async () => {
     await signOut(firebaseApp.auth);
@@ -76,6 +86,37 @@ const Preferences = () => {
                   <LogOut className="mr-2 h-4 w-4" />
                   Log Out
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Appearance Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Appearance
+              </CardTitle>
+              <CardDescription>
+                Customize the appearance of the application
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="theme">Theme</Label>
+                <Select value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}>
+                  <SelectTrigger id="theme">
+                    <SelectValue placeholder="Select theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Choose between light, dark, or system default theme
+                </p>
               </div>
             </CardContent>
           </Card>
