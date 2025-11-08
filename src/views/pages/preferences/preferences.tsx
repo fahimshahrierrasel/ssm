@@ -158,7 +158,7 @@ const Preferences = () => {
                 <div>
                   <h3 className="text-lg font-semibold">Simple Snippet Manager</h3>
                   <Badge variant="secondary" className="mt-1">
-                    v0.2.0
+                    v0.5.0
                   </Badge>
                 </div>
               </div>
