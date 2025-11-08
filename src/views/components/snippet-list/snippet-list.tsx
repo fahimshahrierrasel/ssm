@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Heart } from "lucide-react";
 import { useSnippetStore } from "../../../data/state/snippetStore";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -79,7 +79,7 @@ const SnippetList = ({ openForm }: ISnippetListProps) => {
                     </p>
                   </div>
                   {snippet.is_favourite && (
-                    <span className="text-yellow-500 ml-2">★</span>
+                    <Heart className="h-4 w-4 text-red-500 fill-current ml-2 flex-shrink-0" />
                   )}
                 </div>
                 {snippet.deleted_at && (
